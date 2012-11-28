@@ -1,6 +1,6 @@
 /* $Id$ */
-/* Copyright (c) 2011 Pierre Pronchery <khorben@defora.org> */
-/* This file is part of DeforaOS Desktop Browser */
+/* Copyright (c) 2011-2012 Pierre Pronchery <khorben@defora.org> */
+/* This file is part of DeforaOS libDesktop */
 /* This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
@@ -27,7 +27,6 @@
 #include "Desktop.h"
 #include "../config.h"
 
-
 /* constants */
 #ifndef PREFIX
 # define PREFIX		"/usr/local"
@@ -43,10 +42,8 @@ typedef struct _MimeType
 	char ** globs;
 	size_t globs_cnt;
 	GdkPixbuf * icon_24;
-#if GTK_CHECK_VERSION(2, 6, 0)
 	GdkPixbuf * icon_48;
 	GdkPixbuf * icon_96;
-#endif
 } MimeType;
 
 struct _Mime
@@ -64,8 +61,7 @@ struct _Mime
 
 /* prototypes */
 static char * _mime_get_config_filename(void);
-static GdkPixbuf * _mime_icons_size(Mime * mime, char const * type,
-		int size);
+static GdkPixbuf * _mime_icons_size(Mime * mime, char const * type, int size);
 
 
 /* public */
@@ -76,12 +72,14 @@ static void _new_config(Mime * mime);
 Mime * mime_new(GtkIconTheme * theme)
 {
 	Mime * mime;
-	char * globs[] = {
+	char * globs[] =
+	{
 		PREFIX "/share/mime/globs",
 	       	"/usr/share/mime/globs",
 	       	"/usr/local/share/mime/globs",
 	       	"/usr/pkg/share/mime/globs",
-		NULL };
+		NULL
+	};
 	char ** g = globs;
 	FILE * fp = NULL;
 	char buf[256];
@@ -151,10 +149,8 @@ Mime * mime_new(GtkIconTheme * theme)
 		if(p->globs_cnt++ == 0)
 			mime->types_cnt++;
 		p->icon_24 = NULL;
-#if GTK_CHECK_VERSION(2, 6, 0)
 		p->icon_48 = NULL;
 		p->icon_96 = NULL;
-#endif
 #if 0
 		p->open = mime->config != NULL
 			? config_get(mime->config, buf, "open") : NULL;
@@ -198,10 +194,8 @@ void mime_delete(Mime * mime)
 			free(mime->types[i].globs[j]);
 		free(mime->types[i].globs);
 		free(mime->types[i].icon_24);
-#if GTK_CHECK_VERSION(2, 6, 0)
 		free(mime->types[i].icon_48);
 		free(mime->types[i].icon_96);
-#endif
 	}
 	free(mime->types);
 	if(mime->config != NULL)
@@ -330,7 +324,6 @@ void mime_foreach(Mime * mime, MimeForeachCallback callback, void * data)
 		if(mime->types[i].icon_24 == NULL)
 			mime->types[i].icon_24 = _mime_icons_size(mime,
 					mime->types[i].type, 24);
-#if GTK_CHECK_VERSION(2, 6, 0)
 		if(mime->types[i].icon_48 == NULL)
 			mime->types[i].icon_48 = _mime_icons_size(mime,
 					mime->types[i].type, 48);
@@ -339,10 +332,6 @@ void mime_foreach(Mime * mime, MimeForeachCallback callback, void * data)
 					mime->types[i].type, 96);
 		callback(data, mime->types[i].type, mime->types[i].icon_24,
 				mime->types[i].icon_48, mime->types[i].icon_96);
-#else
-		callback(data, mime->types[i].type, mime->types[i].icon_24,
-				NULL, NULL);
-#endif
 	}
 }
 
@@ -355,38 +344,39 @@ void mime_icons(Mime * mime, char const * type, ...)
 	int size;
 	GdkPixbuf ** icon;
 
-	for(i = 0; i < mime->types_cnt; i++)
-		if(strcmp(type, mime->types[i].type) == 0)
-			break;
-	if(i == mime->types_cnt)
-		return;
+	if(type == NULL)
+		i = mime->types_cnt;
+	else
+		for(i = 0; i < mime->types_cnt; i++)
+			if(strcmp(type, mime->types[i].type) == 0)
+				break;
 	va_start(arg, type);
 	while((size = va_arg(arg, int)) > 0)
 	{
 		icon = va_arg(arg, GdkPixbuf **);
-		if(size == 24)
+		if(i >= mime->types_cnt)
+			*icon = _mime_icons_size(mime, type, size);
+		else if(size == 24)
 		{
 			if(mime->types[i].icon_24 == NULL)
 				mime->types[i].icon_24 = _mime_icons_size(mime,
-						type, 24);
+						type, size);
 			*icon = mime->types[i].icon_24;
 		}
-#if GTK_CHECK_VERSION(2, 6, 0)
 		else if(size == 48)
 		{
 			if(mime->types[i].icon_48 == NULL)
 				mime->types[i].icon_48 = _mime_icons_size(mime,
-						type, 48);
+						type, size);
 			*icon = mime->types[i].icon_48;
 		}
 		else if(size == 96)
 		{
 			if(mime->types[i].icon_96 == NULL)
 				mime->types[i].icon_96 = _mime_icons_size(mime,
-						type, 96);
+						type, size);
 			*icon = mime->types[i].icon_96;
 		}
-#endif
 		else
 			*icon = _mime_icons_size(mime, type, size);
 	}
@@ -423,9 +413,13 @@ static char * _mime_get_config_filename(void)
 
 
 /* mime_icons_size */
-static GdkPixbuf * _mime_icons_size(Mime * mime, char const * type,
-		int size)
+static GdkPixbuf * _icons_size_fallback_file(Mime * mime, int size, int flags);
+static GdkPixbuf * _icons_size_fallback_folder(Mime * mime, int size,
+		int flags);
+
+static GdkPixbuf * _mime_icons_size(Mime * mime, char const * type, int size)
 {
+	GdkPixbuf * ret;
 	static char buf[256] = "gnome-mime-";
 	char * p;
 	GtkIconLookupFlags flags = GTK_ICON_LOOKUP_USE_BUILTIN
@@ -433,9 +427,72 @@ static GdkPixbuf * _mime_icons_size(Mime * mime, char const * type,
 		| GTK_ICON_LOOKUP_GENERIC_FALLBACK
 #endif
 		;
+	char const mountpoint[] = "inode/mountpoint";
+	char const folder[] = "inode/directory";
 
+	if(type == NULL)
+		return _icons_size_fallback_file(mime, size, flags);
+	/* check if it is a mountpoint */
+	if(strcmp(type, mountpoint) == 0)
+	{
+		if((ret = gtk_icon_theme_load_icon(mime->theme, "mount-point",
+						size, flags, NULL)) != NULL)
+			return ret;
+		/* fallback to a folder icon */
+		return _icons_size_fallback_folder(mime, size, flags);
+	}
+	/* check if it is a folder */
+	if(strcmp(type, folder) == 0)
+		return _icons_size_fallback_folder(mime, size, flags);
+	/* try to guess an icon */
 	strncpy(&buf[11], type, sizeof(buf) - 11);
 	buf[sizeof(buf) - 1] = '\0';
 	for(; (p = strchr(&buf[11], '/')) != NULL; *p = '-');
-	return gtk_icon_theme_load_icon(mime->theme, buf, size, flags, NULL);
+	if((ret = gtk_icon_theme_load_icon(mime->theme, buf, size,
+					flags, NULL)) != NULL)
+		return ret;
+	return _icons_size_fallback_file(mime, size, flags);
+}
+
+static GdkPixbuf * _icons_size_fallback_file(Mime * mime, int size, int flags)
+{
+	GdkPixbuf * ret;
+	char const * fallbacks[] =
+	{
+		"gnome-fs-regular",
+#if GTK_CHECK_VERSION(2, 6, 0)
+		GTK_STOCK_FILE,
+#endif
+		GTK_STOCK_MISSING_IMAGE
+	};
+	size_t i;
+
+	/* fallback to a regular icon */
+	for(i = 0; i < sizeof(fallbacks) / sizeof(*fallbacks); i++)
+		if((ret = gtk_icon_theme_load_icon(mime->theme, fallbacks[i],
+						size, flags, NULL)) != NULL)
+			return ret;
+	return NULL;
+}
+
+static GdkPixbuf * _icons_size_fallback_folder(Mime * mime, int size, int flags)
+{
+	GdkPixbuf * ret;
+	char const * fallbacks[] =
+	{
+		"gnome-fs-directory",
+#if GTK_CHECK_VERSION(2, 6, 0)
+		GTK_STOCK_DIRECTORY,
+#endif
+		GTK_STOCK_MISSING_IMAGE
+	};
+	size_t i;
+
+	/* fallback to a folder icon */
+	for(i = 0; i < sizeof(fallbacks) / sizeof(*fallbacks); i++)
+		if((ret = gtk_icon_theme_load_icon(mime->theme, fallbacks[i],
+						size, flags, NULL)) != NULL)
+			return ret;
+	/* fallback to a regular icon */
+	return _icons_size_fallback_file(mime, size, flags);
 }
