@@ -21,11 +21,11 @@ distclean:
 
 install:
 	@for i in $(SUBDIRS); do (cd $$i && $(MAKE) install) || exit; done
-	$(MKDIR) $(DESTDIR)$(PREFIX)/include
-	$(INSTALL) -m 0644 -- Desktop.h $(DESTDIR)$(PREFIX)/include/Desktop.h
+	$(MKDIR) $(DESTDIR)$(INCLUDEDIR)
+	$(INSTALL) -m 0644 -- Desktop.h $(DESTDIR)$(INCLUDEDIR)/Desktop.h
 
 uninstall:
 	@for i in $(SUBDIRS); do (cd $$i && $(MAKE) uninstall) || exit; done
-	$(RM) -- $(DESTDIR)$(PREFIX)/include/Desktop.h
+	$(RM) -- $(DESTDIR)$(INCLUDEDIR)/Desktop.h
 
 .PHONY: all subdirs clean distclean install uninstall
