@@ -193,9 +193,12 @@ void mime_delete(Mime * mime)
 		for(j = 0; j < mime->types[i].globs_cnt; j++)
 			free(mime->types[i].globs[j]);
 		free(mime->types[i].globs);
-		free(mime->types[i].icon_24);
-		free(mime->types[i].icon_48);
-		free(mime->types[i].icon_96);
+		if(mime->types[i].icon_24 != NULL)
+			g_object_unref(mime->types[i].icon_24);
+		if(mime->types[i].icon_48 != NULL)
+			g_object_unref(mime->types[i].icon_48);
+		if(mime->types[i].icon_96 != NULL)
+			g_object_unref(mime->types[i].icon_96);
 	}
 	free(mime->types);
 	if(mime->config != NULL)
@@ -362,6 +365,7 @@ void mime_icons(Mime * mime, char const * type, ...)
 				mime->types[i].icon_24 = _mime_icons_size(mime,
 						type, size);
 			*icon = mime->types[i].icon_24;
+			g_object_ref(*icon);
 		}
 		else if(size == 48)
 		{
@@ -369,6 +373,7 @@ void mime_icons(Mime * mime, char const * type, ...)
 				mime->types[i].icon_48 = _mime_icons_size(mime,
 						type, size);
 			*icon = mime->types[i].icon_48;
+			g_object_ref(*icon);
 		}
 		else if(size == 96)
 		{
@@ -376,6 +381,7 @@ void mime_icons(Mime * mime, char const * type, ...)
 				mime->types[i].icon_96 = _mime_icons_size(mime,
 						type, size);
 			*icon = mime->types[i].icon_96;
+			g_object_ref(*icon);
 		}
 		else
 			*icon = _mime_icons_size(mime, type, size);
