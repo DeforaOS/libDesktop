@@ -328,6 +328,20 @@ compat
 
 
 
+<!-- ##### MACRO GDK_KEY_Page_Down ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GDK_KEY_Page_Up ##### -->
+<para>
+
+</para>
+
+
+
 <!-- ##### MACRO GDK_KEY_Q ##### -->
 <para>
 
@@ -459,5 +473,13 @@ compat
 
 </para>
 
+
+
+<!-- ##### FUNCTION gdk_window_clear ##### -->
+<para>
+
+</para>
+
+@window: 
 
 
