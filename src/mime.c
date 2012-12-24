@@ -31,6 +31,9 @@
 #ifndef PREFIX
 # define PREFIX		"/usr/local"
 #endif
+#ifndef DATADIR
+# define DATADIR	PREFIX "/share"
+#endif
 
 
 /* Mime */
@@ -74,7 +77,7 @@ Mime * mime_new(GtkIconTheme * theme)
 	Mime * mime;
 	char * globs[] =
 	{
-		PREFIX "/share/mime/globs",
+		DATADIR "/mime/globs",
 	       	"/usr/share/mime/globs",
 	       	"/usr/local/share/mime/globs",
 	       	"/usr/pkg/share/mime/globs",
