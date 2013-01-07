@@ -14,6 +14,7 @@ libDesktop.pc: libDesktop.pc.in ../config.sh
 
 clean:
 	$(RM) -- $(libDesktop.pc_OBJS)
+	./pkgconfig.sh -c -P "$(PREFIX)" -- "libDesktop.pc"
 
 distclean: clean
 	$(RM) -- $(TARGETS)
