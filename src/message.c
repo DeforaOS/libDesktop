@@ -32,6 +32,7 @@
 /* types */
 typedef struct _MessageCallback
 {
+	GtkWidget * widget;
 	Window window;
 	DesktopMessageCallback callback;
 	void * data;
@@ -59,6 +60,14 @@ int desktop_message_register(GtkWidget * window, char const * destination,
 	/* XXX memory leak */
 	if((mc = object_new(sizeof(*mc))) == NULL)
 		return -1;
+	if(window == NULL)
+	{
+		window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+		mc->widget = window;
+		gtk_widget_realize(window);
+	}
+	else
+		mc->widget = NULL;
 	w = gtk_widget_get_window(window);
 	mc->window = GDK_WINDOW_XWINDOW(w);
 	mc->callback = callback;
@@ -121,6 +130,8 @@ static GdkFilterReturn _desktop_message_on_callback(GdkXEvent * xevent,
 	value3 = xcme->data.l[2];
 	if(mc->callback(mc->data, value1, value2, value3) == 0)
 		return GDK_FILTER_CONTINUE;
+	if(mc->widget != NULL)
+		gtk_widget_destroy(mc->widget);
 	object_delete(mc);
 	return GDK_FILTER_REMOVE;
 }
