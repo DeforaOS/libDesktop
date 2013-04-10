@@ -1,5 +1,5 @@
 /* $Id$ */
-/* Copyright (c) 2011-2012 Pierre Pronchery <khorben@defora.org> */
+/* Copyright (c) 2011-2013 Pierre Pronchery <khorben@defora.org> */
 /* This file is part of DeforaOS Desktop libDesktop */
 /* This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,6 +32,7 @@
 /* types */
 typedef struct _MessageCallback
 {
+	Window window;
 	DesktopMessageCallback callback;
 	void * data;
 } MessageCallback;
@@ -48,14 +49,18 @@ static GdkFilterReturn _desktop_message_on_callback(GdkXEvent * xevent,
 /* public */
 /* functions */
 /* desktop_message_register */
-int desktop_message_register(char const * destination,
+int desktop_message_register(GtkWidget * window, char const * destination,
 		DesktopMessageCallback callback, void * data)
 {
 #if !GTK_CHECK_VERSION(3, 0, 0)
 	MessageCallback * mc;
+	GdkWindow * w;
 
+	/* XXX memory leak */
 	if((mc = object_new(sizeof(*mc))) == NULL)
 		return -1;
+	w = gtk_widget_get_window(window);
+	mc->window = GDK_WINDOW_XWINDOW(w);
 	mc->callback = callback;
 	mc->data = data;
 	gdk_add_client_message_filter(gdk_atom_intern(destination, FALSE),
@@ -105,6 +110,12 @@ static GdkFilterReturn _desktop_message_on_callback(GdkXEvent * xevent,
 	if(xev->type != ClientMessage)
 		return GDK_FILTER_CONTINUE;
 	xcme = &xev->xclient;
+# ifdef DEBUG
+	fprintf(stderr, "DEBUG: %s(%lu %lu) %lu\n", __func__, xcme->serial,
+			xcme->window, mc->window);
+# endif
+	if(mc->window != xcme->window)
+		return GDK_FILTER_CONTINUE;
 	value1 = xcme->data.l[0];
 	value2 = xcme->data.l[1];
 	value3 = xcme->data.l[2];

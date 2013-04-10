@@ -1,5 +1,5 @@
 /* $Id$ */
-/* Copyright (c) 2011-2012 Pierre Pronchery <khorben@defora.org> */
+/* Copyright (c) 2011-2013 Pierre Pronchery <khorben@defora.org> */
 /* This file is part of DeforaOS Desktop libDesktop */
 /* This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ typedef int (*DesktopMessageCallback)(void * data, uint32_t value1,
 
 
 /* functions */
-int desktop_message_register(char const * destination,
+int desktop_message_register(GtkWidget * window, char const * destination,
 		DesktopMessageCallback callback, void * data);
 int desktop_message_send(char const * destination, uint32_t value1,
 		uint32_t value2, uint32_t value3);
