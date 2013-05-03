@@ -64,8 +64,8 @@ distclean: clean
 
 install: $(TARGETS)
 	$(MKDIR) $(DESTDIR)$(PREFIX)/lib
-	$(INSTALL) -m 0644 -- libDesktop.a $(DESTDIR)$(PREFIX)/lib/libDesktop.a
-	$(INSTALL) -m 0755 -- libDesktop.so.0.0 $(DESTDIR)$(PREFIX)/lib/libDesktop.so.0.0
+	$(INSTALL) -m 0644 libDesktop.a $(DESTDIR)$(PREFIX)/lib/libDesktop.a
+	$(INSTALL) -m 0755 libDesktop.so.0.0 $(DESTDIR)$(PREFIX)/lib/libDesktop.so.0.0
 	$(LN) -s -- libDesktop.so.0.0 $(DESTDIR)$(PREFIX)/lib/libDesktop.so.0
 	$(LN) -s -- libDesktop.so.0.0 $(DESTDIR)$(PREFIX)/lib/libDesktop.so
 

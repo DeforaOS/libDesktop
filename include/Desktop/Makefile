@@ -15,21 +15,21 @@ distclean: clean
 
 install:
 	$(MKDIR) $(DESTDIR)$(INCLUDEDIR)/Desktop
-	$(INSTALL) -m 0644 -- about.h $(DESTDIR)$(INCLUDEDIR)/Desktop/about.h
+	$(INSTALL) -m 0644 about.h $(DESTDIR)$(INCLUDEDIR)/Desktop/about.h
 	$(MKDIR) $(DESTDIR)$(INCLUDEDIR)/Desktop
-	$(INSTALL) -m 0644 -- accel.h $(DESTDIR)$(INCLUDEDIR)/Desktop/accel.h
+	$(INSTALL) -m 0644 accel.h $(DESTDIR)$(INCLUDEDIR)/Desktop/accel.h
 	$(MKDIR) $(DESTDIR)$(INCLUDEDIR)/Desktop
-	$(INSTALL) -m 0644 -- compat.h $(DESTDIR)$(INCLUDEDIR)/Desktop/compat.h
+	$(INSTALL) -m 0644 compat.h $(DESTDIR)$(INCLUDEDIR)/Desktop/compat.h
 	$(MKDIR) $(DESTDIR)$(INCLUDEDIR)/Desktop
-	$(INSTALL) -m 0644 -- help.h $(DESTDIR)$(INCLUDEDIR)/Desktop/help.h
+	$(INSTALL) -m 0644 help.h $(DESTDIR)$(INCLUDEDIR)/Desktop/help.h
 	$(MKDIR) $(DESTDIR)$(INCLUDEDIR)/Desktop
-	$(INSTALL) -m 0644 -- menubar.h $(DESTDIR)$(INCLUDEDIR)/Desktop/menubar.h
+	$(INSTALL) -m 0644 menubar.h $(DESTDIR)$(INCLUDEDIR)/Desktop/menubar.h
 	$(MKDIR) $(DESTDIR)$(INCLUDEDIR)/Desktop
-	$(INSTALL) -m 0644 -- message.h $(DESTDIR)$(INCLUDEDIR)/Desktop/message.h
+	$(INSTALL) -m 0644 message.h $(DESTDIR)$(INCLUDEDIR)/Desktop/message.h
 	$(MKDIR) $(DESTDIR)$(INCLUDEDIR)/Desktop
-	$(INSTALL) -m 0644 -- mime.h $(DESTDIR)$(INCLUDEDIR)/Desktop/mime.h
+	$(INSTALL) -m 0644 mime.h $(DESTDIR)$(INCLUDEDIR)/Desktop/mime.h
 	$(MKDIR) $(DESTDIR)$(INCLUDEDIR)/Desktop
-	$(INSTALL) -m 0644 -- toolbar.h $(DESTDIR)$(INCLUDEDIR)/Desktop/toolbar.h
+	$(INSTALL) -m 0644 toolbar.h $(DESTDIR)$(INCLUDEDIR)/Desktop/toolbar.h
 
 uninstall:
 	$(RM) -- $(DESTDIR)$(INCLUDEDIR)/Desktop/about.h
