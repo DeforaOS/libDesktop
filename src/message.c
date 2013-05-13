@@ -30,6 +30,7 @@
 /* Message */
 /* private */
 /* types */
+#if !GTK_CHECK_VERSION(3, 0, 0)
 typedef struct _MessageCallback
 {
 	GtkWidget * widget;
@@ -37,6 +38,7 @@ typedef struct _MessageCallback
 	DesktopMessageCallback callback;
 	void * data;
 } MessageCallback;
+#endif
 
 
 /* prototypes */
