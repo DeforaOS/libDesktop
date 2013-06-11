@@ -37,6 +37,7 @@ DesktopMessage
 
 </para>
 
+@window: 
 @destination: 
 @callback: 
 @data: 
