@@ -3,9 +3,9 @@
                "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd"
 [
   <!ENTITY % local.common.attrib "xmlns:xi  CDATA  #FIXED 'http://www.w3.org/2003/XInclude'">
-  <!ENTITY server "www.defora.org/doc/html">
+  <!ENTITY server "www.defora.org/doc/gtk-doc/html">
   <!ENTITY title "DeforaOS libDesktop">
-  <!ENTITY version "0.0.9">
+  <!ENTITY version "0.0.10">
 ]>
 <book id="index">
   <bookinfo>
