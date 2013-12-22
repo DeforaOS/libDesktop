@@ -1,5 +1,5 @@
 #define PACKAGE "libDesktop"
-#define VERSION "0.0.10"
+#define VERSION "0.1.0"
 
 #ifndef PREFIX
 # define PREFIX "/usr/local"
