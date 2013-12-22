@@ -41,7 +41,17 @@ DesktopMessage
 @destination: 
 @callback: 
 @data: 
-@Returns: 
+@Returns: 0 for success, -1 on errors
+
+
+<!-- ##### FUNCTION desktop_message_unregister ##### -->
+<para>
+
+</para>
+
+@window: 
+@callback: 
+@data: 
 
 
 <!-- ##### FUNCTION desktop_message_send ##### -->
@@ -53,6 +63,6 @@ DesktopMessage
 @value1: 
 @value2: 
 @value3: 
-@Returns: 
+@Returns: 0 for success, -1 on errors
 
 
