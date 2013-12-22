@@ -94,8 +94,11 @@ int desktop_message_register(GtkWidget * window, char const * destination,
 	mc->data = data;
 	atom = gdk_atom_intern(destination, FALSE);
 	gdk_add_client_message_filter(atom, _desktop_message_on_callback, mc);
-#endif
 	return 0;
+#else
+	/* FIXME implement another method */
+	return -1;
+#endif
 }
 
 
@@ -119,6 +122,9 @@ int desktop_message_send(char const * destination, uint32_t value1,
 	client->data.l[1] = value2;
 	client->data.l[2] = value3;
 	gdk_event_send_clientmessage_toall(&event);
+#else
+	/* FIXME implement another method */
+	return -1;
 #endif
 	return 0;
 }
@@ -157,6 +163,8 @@ void desktop_message_unregister(GtkWidget * window,
 	if((p = realloc(_callbacks, sizeof(*p) * (--_callbacks_cnt))) != NULL
 			|| _callbacks_cnt == 0)
 		_callbacks = p;
+#else
+	/* FIXME implement another method */
 #endif
 }
 
