@@ -50,7 +50,7 @@ menubar.o: menubar.c
 message.o: message.c
 	$(CC) $(libDesktop_CFLAGS) -c message.c
 
-mime.o: mime.c
+mime.o: mime.c ../config.h
 	$(CC) $(libDesktop_CFLAGS) -c mime.c
 
 toolbar.o: toolbar.c
