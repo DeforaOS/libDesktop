@@ -41,7 +41,7 @@ accel.o: accel.c
 compat.o: compat.c
 	$(CC) $(libDesktop_CFLAGS) -c compat.c
 
-help.o: help.c
+help.o: help.c ../config.h
 	$(CC) $(libDesktop_CFLAGS) -c help.c
 
 menubar.o: menubar.c

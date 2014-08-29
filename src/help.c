@@ -1,5 +1,5 @@
 /* $Id$ */
-/* Copyright (c) 2012 Pierre Pronchery <khorben@defora.org> */
+/* Copyright (c) 2012-2014 Pierre Pronchery <khorben@defora.org> */
 /* This file is part of DeforaOS Desktop libDesktop */
 /* This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,13 +21,24 @@
 #include <glib.h>
 #include <System.h>
 #include "Desktop.h"
+#include "../config.h"
+
+#ifndef PREFIX
+# define PREFIX		"/usr/local"
+#endif
+#ifndef DATADIR
+# define DATADIR	PREFIX "/share"
+#endif
+#ifndef MANDIR
+# define MANDIR		DATADIR "/man"
+#endif
 
 
 /* Help */
 /* desktop_help_contents */
 int desktop_help_contents(char const * package, char const * command)
 {
-	char * argv[] = { "helper", "helper", "-p", NULL, "--", NULL, NULL };
+	char * argv[] = { "helper", "helper", "-s", "1", "--", NULL, NULL };
 	GSpawnFlags flags = G_SPAWN_SEARCH_PATH | G_SPAWN_FILE_AND_ARGV_ZERO;
 	GError * error = NULL;
 
@@ -35,16 +46,9 @@ int desktop_help_contents(char const * package, char const * command)
 		return -1;
 	if(command == NULL)
 		command = "index";
-	argv[3] = strdup(package);
-	argv[5] = strdup(command);
-	if(argv[3] == NULL || argv[5] == NULL)
-	{
-		free(argv[3]);
-		free(argv[5]);
+	if((argv[5] = strdup(command)) == NULL)
 		return -error_set_code(1, "%s", strerror(errno));
-	}
 	g_spawn_async(NULL, argv, NULL, flags, NULL, NULL, NULL, &error);
-	free(argv[3]);
 	free(argv[5]);
 	if(error != NULL)
 	{
