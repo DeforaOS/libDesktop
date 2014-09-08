@@ -30,6 +30,8 @@ install:
 	$(INSTALL) -m 0644 mime.h $(DESTDIR)$(INCLUDEDIR)/Desktop/mime.h
 	$(MKDIR) $(DESTDIR)$(INCLUDEDIR)/Desktop
 	$(INSTALL) -m 0644 toolbar.h $(DESTDIR)$(INCLUDEDIR)/Desktop/toolbar.h
+	$(MKDIR) $(DESTDIR)$(INCLUDEDIR)/Desktop
+	$(INSTALL) -m 0644 widget.h $(DESTDIR)$(INCLUDEDIR)/Desktop/widget.h
 
 uninstall:
 	$(RM) -- $(DESTDIR)$(INCLUDEDIR)/Desktop/about.h
@@ -40,5 +42,6 @@ uninstall:
 	$(RM) -- $(DESTDIR)$(INCLUDEDIR)/Desktop/message.h
 	$(RM) -- $(DESTDIR)$(INCLUDEDIR)/Desktop/mime.h
 	$(RM) -- $(DESTDIR)$(INCLUDEDIR)/Desktop/toolbar.h
+	$(RM) -- $(DESTDIR)$(INCLUDEDIR)/Desktop/widget.h
 
 .PHONY: all clean distclean install uninstall

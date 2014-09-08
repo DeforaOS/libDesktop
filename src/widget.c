@@ -1,5 +1,5 @@
 /* $Id$ */
-/* Copyright (c) 2009-2012 Pierre Pronchery <khorben@defora.org> */
+/* Copyright (c) 2014 Pierre Pronchery <khorben@defora.org> */
 /* This file is part of DeforaOS Desktop libDesktop */
 /* This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,20 +15,24 @@
 
 
 
-#ifndef LIBDESKTOP_DESKTOP_H
-# define LIBDESKTOP_DESKTOP_H
+#include "Desktop.h"
+#include "../config.h"
 
-# include <gtk/gtk.h>
+#ifndef PREFIX
+# define PREFIX		"/usr/local"
+#endif
+#ifndef LIBDIR
+# define LIBDIR		PREFIX "/lib"
+#endif
 
 
-# include "Desktop/about.h"
-# include "Desktop/accel.h"
-# include "Desktop/compat.h"
-# include "Desktop/help.h"
-# include "Desktop/menubar.h"
-# include "Desktop/message.h"
-# include "Desktop/mime.h"
-# include "Desktop/toolbar.h"
-# include "Desktop/widget.h"
+/* Widget */
+/* desktop_widget_new */
+GtkWidget * desktop_widget_new(char const * name)
+{
+	GtkWidget * ret;
 
-#endif /* !LIBDESKTOP_DESKTOP_H */
+	/* FIXME really implement */
+	ret = gtk_label_new(name);
+	return ret;
+}

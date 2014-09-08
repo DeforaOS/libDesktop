@@ -55,6 +55,7 @@ dist:
 		$(PACKAGE)-$(VERSION)/include/Desktop/message.h \
 		$(PACKAGE)-$(VERSION)/include/Desktop/mime.h \
 		$(PACKAGE)-$(VERSION)/include/Desktop/toolbar.h \
+		$(PACKAGE)-$(VERSION)/include/Desktop/widget.h \
 		$(PACKAGE)-$(VERSION)/include/Desktop/Makefile \
 		$(PACKAGE)-$(VERSION)/include/Desktop/project.conf \
 		$(PACKAGE)-$(VERSION)/src/about.c \
@@ -65,6 +66,7 @@ dist:
 		$(PACKAGE)-$(VERSION)/src/message.c \
 		$(PACKAGE)-$(VERSION)/src/mime.c \
 		$(PACKAGE)-$(VERSION)/src/toolbar.c \
+		$(PACKAGE)-$(VERSION)/src/widget.c \
 		$(PACKAGE)-$(VERSION)/src/Makefile \
 		$(PACKAGE)-$(VERSION)/src/project.conf \
 		$(PACKAGE)-$(VERSION)/Makefile \

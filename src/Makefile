@@ -19,7 +19,7 @@ INSTALL	= install
 
 all: $(TARGETS)
 
-libDesktop_OBJS = about.o accel.o compat.o help.o menubar.o message.o mime.o toolbar.o
+libDesktop_OBJS = about.o accel.o compat.o help.o menubar.o message.o mime.o toolbar.o widget.o
 libDesktop_CFLAGS = $(CPPFLAGSF) $(CPPFLAGS) $(CFLAGSF) $(CFLAGS)
 libDesktop_LDFLAGS = $(LDFLAGSF) $(LDFLAGS)
 
@@ -55,6 +55,9 @@ mime.o: mime.c ../config.h
 
 toolbar.o: toolbar.c
 	$(CC) $(libDesktop_CFLAGS) -c toolbar.c
+
+widget.o: widget.c ../config.h
+	$(CC) $(libDesktop_CFLAGS) -c widget.c
 
 clean:
 	$(RM) -- $(libDesktop_OBJS)
