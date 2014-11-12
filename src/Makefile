@@ -1,4 +1,5 @@
-TARGETS	= libDesktop.a libDesktop.so.0.0 libDesktop.so.0 libDesktop.so
+TARGETS	= $(OBJDIR)libDesktop.a $(OBJDIR)libDesktop.so.0.0 $(OBJDIR)libDesktop.so.0 $(OBJDIR)libDesktop.so
+OBJDIR	=
 PREFIX	= /usr/local
 DESTDIR	=
 LIBDIR	= $(PREFIX)/lib
@@ -19,45 +20,45 @@ INSTALL	= install
 
 all: $(TARGETS)
 
-libDesktop_OBJS = about.o accel.o compat.o help.o menubar.o message.o mime.o toolbar.o widget.o
+libDesktop_OBJS = $(OBJDIR)about.o $(OBJDIR)accel.o $(OBJDIR)compat.o $(OBJDIR)help.o $(OBJDIR)menubar.o $(OBJDIR)message.o $(OBJDIR)mime.o $(OBJDIR)toolbar.o $(OBJDIR)widget.o
 libDesktop_CFLAGS = $(CPPFLAGSF) $(CPPFLAGS) $(CFLAGSF) $(CFLAGS)
 libDesktop_LDFLAGS = $(LDFLAGSF) $(LDFLAGS)
 
-libDesktop.a: $(libDesktop_OBJS)
-	$(AR) -rc libDesktop.a $(libDesktop_OBJS)
-	$(RANLIB) libDesktop.a
+$(OBJDIR)libDesktop.a: $(libDesktop_OBJS)
+	$(AR) -rc $(OBJDIR)libDesktop.a $(libDesktop_OBJS)
+	$(RANLIB) $(OBJDIR)libDesktop.a
 
-libDesktop.so.0.0 libDesktop.so.0 libDesktop.so: $(libDesktop_OBJS)
-	$(CCSHARED) -o libDesktop.so.0.0 -Wl,-soname,libDesktop.so.0 $(libDesktop_OBJS) $(libDesktop_LDFLAGS)
-	$(LN) -s -- libDesktop.so.0.0 libDesktop.so.0
-	$(LN) -s -- libDesktop.so.0.0 libDesktop.so
+$(OBJDIR)libDesktop.so.0.0 $(OBJDIR)libDesktop.so.0 $(OBJDIR)libDesktop.so: $(libDesktop_OBJS)
+	$(CCSHARED) -o $(OBJDIR)libDesktop.so.0.0 -Wl,-soname,libDesktop.so.0 $(libDesktop_OBJS) $(libDesktop_LDFLAGS)
+	$(LN) -s -- libDesktop.so.0.0 $(OBJDIR)libDesktop.so.0
+	$(LN) -s -- libDesktop.so.0.0 $(OBJDIR)libDesktop.so
 
-about.o: about.c
-	$(CC) $(libDesktop_CFLAGS) -c about.c
+$(OBJDIR)about.o: about.c
+	$(CC) $(libDesktop_CFLAGS) -o $(OBJDIR)about.o -c about.c
 
-accel.o: accel.c
-	$(CC) $(libDesktop_CFLAGS) -c accel.c
+$(OBJDIR)accel.o: accel.c
+	$(CC) $(libDesktop_CFLAGS) -o $(OBJDIR)accel.o -c accel.c
 
-compat.o: compat.c
-	$(CC) $(libDesktop_CFLAGS) -c compat.c
+$(OBJDIR)compat.o: compat.c
+	$(CC) $(libDesktop_CFLAGS) -o $(OBJDIR)compat.o -c compat.c
 
-help.o: help.c ../config.h
-	$(CC) $(libDesktop_CFLAGS) -c help.c
+$(OBJDIR)help.o: help.c ../config.h
+	$(CC) $(libDesktop_CFLAGS) -o $(OBJDIR)help.o -c help.c
 
-menubar.o: menubar.c
-	$(CC) $(libDesktop_CFLAGS) -c menubar.c
+$(OBJDIR)menubar.o: menubar.c
+	$(CC) $(libDesktop_CFLAGS) -o $(OBJDIR)menubar.o -c menubar.c
 
-message.o: message.c
-	$(CC) $(libDesktop_CFLAGS) -c message.c
+$(OBJDIR)message.o: message.c
+	$(CC) $(libDesktop_CFLAGS) -o $(OBJDIR)message.o -c message.c
 
-mime.o: mime.c ../config.h
-	$(CC) $(libDesktop_CFLAGS) -c mime.c
+$(OBJDIR)mime.o: mime.c ../config.h
+	$(CC) $(libDesktop_CFLAGS) -o $(OBJDIR)mime.o -c mime.c
 
-toolbar.o: toolbar.c
-	$(CC) $(libDesktop_CFLAGS) -c toolbar.c
+$(OBJDIR)toolbar.o: toolbar.c
+	$(CC) $(libDesktop_CFLAGS) -o $(OBJDIR)toolbar.o -c toolbar.c
 
-widget.o: widget.c ../config.h
-	$(CC) $(libDesktop_CFLAGS) -c widget.c
+$(OBJDIR)widget.o: widget.c ../config.h
+	$(CC) $(libDesktop_CFLAGS) -o $(OBJDIR)widget.o -c widget.c
 
 clean:
 	$(RM) -- $(libDesktop_OBJS)
@@ -67,8 +68,8 @@ distclean: clean
 
 install: $(TARGETS)
 	$(MKDIR) $(DESTDIR)$(PREFIX)/lib
-	$(INSTALL) -m 0644 libDesktop.a $(DESTDIR)$(PREFIX)/lib/libDesktop.a
-	$(INSTALL) -m 0755 libDesktop.so.0.0 $(DESTDIR)$(PREFIX)/lib/libDesktop.so.0.0
+	$(INSTALL) -m 0644 $(OBJDIR)libDesktop.a $(DESTDIR)$(PREFIX)/lib/libDesktop.a
+	$(INSTALL) -m 0755 $(OBJDIR)libDesktop.so.0.0 $(DESTDIR)$(PREFIX)/lib/libDesktop.so.0.0
 	$(LN) -s -- libDesktop.so.0.0 $(DESTDIR)$(PREFIX)/lib/libDesktop.so.0
 	$(LN) -s -- libDesktop.so.0.0 $(DESTDIR)$(PREFIX)/lib/libDesktop.so
 

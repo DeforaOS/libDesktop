@@ -1,4 +1,5 @@
-TARGETS	= libDesktop.pc
+TARGETS	= $(OBJDIR)libDesktop.pc
+OBJDIR	=
 PREFIX	= /usr/local
 DESTDIR	=
 RM	= rm -f
@@ -9,8 +10,8 @@ INSTALL	= install
 
 all: $(TARGETS)
 
-libDesktop.pc: libDesktop.pc.in ../config.sh
-	./pkgconfig.sh -P "$(PREFIX)" -- "libDesktop.pc"
+$(OBJDIR)libDesktop.pc: libDesktop.pc.in ../config.sh
+	./pkgconfig.sh -P "$(PREFIX)" -- "$(OBJDIR)libDesktop.pc"
 
 clean:
 	$(RM) -- $(libDesktop.pc_OBJS)
@@ -20,7 +21,7 @@ distclean: clean
 	$(RM) -- $(TARGETS)
 
 install: $(TARGETS)
-	./pkgconfig.sh -P "$(DESTDIR)$(PREFIX)" -i -- "libDesktop.pc"
+	./pkgconfig.sh -P "$(DESTDIR)$(PREFIX)" -i -- "$(OBJDIR)libDesktop.pc"
 
 uninstall:
 	./pkgconfig.sh -P "$(DESTDIR)$(PREFIX)" -u -- "libDesktop.pc"
