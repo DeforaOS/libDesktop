@@ -20,6 +20,16 @@
 
 
 /* Widget */
-GtkWidget * desktop_widget_new(char const * name);
+/* public */
+/* types */
+typedef struct _DesktopWidget DesktopWidget;
+
+
+/* functions */
+DesktopWidget * desktop_widget_new(char const * name);
+void desktop_widget_delete(DesktopWidget * widget);
+
+/* accessors */
+GtkWidget * desktop_widget_get_widget(DesktopWidget * widget);
 
 #endif /* !LIBDESKTOP_DESKTOP_WIDGET_H */

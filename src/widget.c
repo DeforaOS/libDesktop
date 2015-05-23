@@ -15,6 +15,7 @@
 
 
 
+#include <System.h>
 #include "Desktop.h"
 #include "../config.h"
 
@@ -27,12 +28,41 @@
 
 
 /* Widget */
-/* desktop_widget_new */
-GtkWidget * desktop_widget_new(char const * name)
+/* private */
+/* types */
+struct _DesktopWidget
 {
-	GtkWidget * ret;
+	GtkWidget * widget;
+};
 
+
+/* public */
+/* functions */
+/* desktop_widget_new */
+DesktopWidget * desktop_widget_new(char const * name)
+{
+	DesktopWidget * ret;
+
+	if((ret = object_new(sizeof(*ret))) == NULL)
+		return NULL;
 	/* FIXME really implement */
-	ret = gtk_label_new(name);
+	ret->widget = gtk_label_new(name);
 	return ret;
+}
+
+
+/* desktop_widget_delete */
+void desktop_widget_delete(DesktopWidget * widget)
+{
+	gtk_widget_destroy(widget->widget);
+	object_delete(widget);
+}
+
+
+/* accessors */
+/* desktop_widget_get_widget */
+GtkWidget * desktop_widget_get_widget(DesktopWidget * widget)
+{
+	/* FIXME really implement */
+	return widget->widget;
 }
