@@ -32,7 +32,9 @@
 /* types */
 struct _DesktopWidget
 {
-	GtkWidget * widget;
+	Plugin * plugin;
+	DesktopWidgetDefinition * definition;
+	DesktopWidgetPlugin * dplugin;
 };
 
 
@@ -41,20 +43,28 @@ struct _DesktopWidget
 /* desktop_widget_new */
 DesktopWidget * desktop_widget_new(char const * name)
 {
-	DesktopWidget * ret;
+	DesktopWidget * widget;
 
-	if((ret = object_new(sizeof(*ret))) == NULL)
+	if((widget = object_new(sizeof(*widget))) == NULL)
 		return NULL;
-	/* FIXME really implement */
-	ret->widget = gtk_label_new(name);
-	return ret;
+	if((widget->plugin = plugin_new(LIBDIR, "Desktop", "widget", name))
+			== NULL || (widget->definition = plugin_lookup(
+					widget->plugin, "widget")) == NULL)
+	{
+		desktop_widget_delete(widget);
+		return NULL;
+	}
+	return widget;
 }
 
 
 /* desktop_widget_delete */
 void desktop_widget_delete(DesktopWidget * widget)
 {
-	gtk_widget_destroy(widget->widget);
+	if(widget->definition != NULL && widget->plugin != NULL)
+		widget->definition->destroy(widget->plugin);
+	if(widget->plugin != NULL)
+		plugin_delete(widget->plugin);
 	object_delete(widget);
 }
 
@@ -63,6 +73,5 @@ void desktop_widget_delete(DesktopWidget * widget)
 /* desktop_widget_get_widget */
 GtkWidget * desktop_widget_get_widget(DesktopWidget * widget)
 {
-	/* FIXME really implement */
-	return widget->widget;
+	return widget->definition->get_widget(widget->dplugin);
 }

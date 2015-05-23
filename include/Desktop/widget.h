@@ -24,6 +24,18 @@
 /* types */
 typedef struct _DesktopWidget DesktopWidget;
 
+typedef struct _DesktopWidgetPlugin DesktopWidgetPlugin;
+
+typedef struct _DesktopWidgetDefinition
+{
+	char const * name;
+	char const * icon;
+	char const * description;
+	DesktopWidgetPlugin * (*init)(char const * name);
+	void (*destroy)(DesktopWidgetPlugin * widget);
+	GtkWidget * (*get_widget)(DesktopWidgetPlugin * widget);
+} DesktopWidgetDefinition;
+
 
 /* functions */
 DesktopWidget * desktop_widget_new(char const * name);
