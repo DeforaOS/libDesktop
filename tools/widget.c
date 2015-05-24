@@ -61,7 +61,7 @@ static int _widget(int namec, char ** namev)
 			continue;
 		}
 		test = desktop_widget_get_widget(widget);
-		gtk_box_pack_start(GTK_BOX(box), test, FALSE, TRUE, 0);
+		gtk_box_pack_start(GTK_BOX(box), test, TRUE, TRUE, 0);
 	}
 	gtk_container_add(GTK_CONTAINER(window), box);
 	gtk_widget_show_all(window);
