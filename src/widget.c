@@ -47,9 +47,17 @@ DesktopWidget * desktop_widget_new(char const * name)
 
 	if((widget = object_new(sizeof(*widget))) == NULL)
 		return NULL;
-	if((widget->plugin = plugin_new(LIBDIR, "Desktop", "widget", name))
-			== NULL || (widget->definition = plugin_lookup(
-					widget->plugin, "widget")) == NULL)
+	widget->definition = NULL;
+	widget->dplugin = NULL;
+	if((widget->plugin = plugin_new(LIBDIR, "Desktop", "widget",
+					name)) == NULL
+			|| (widget->definition = plugin_lookup(widget->plugin,
+					"widget")) == NULL
+			|| widget->definition->init == NULL
+			|| widget->definition->destroy == NULL
+			|| widget->definition->get_widget == NULL
+			|| (widget->dplugin = widget->definition->init(name))
+			== NULL)
 	{
 		desktop_widget_delete(widget);
 		return NULL;
@@ -61,8 +69,8 @@ DesktopWidget * desktop_widget_new(char const * name)
 /* desktop_widget_delete */
 void desktop_widget_delete(DesktopWidget * widget)
 {
-	if(widget->definition != NULL && widget->plugin != NULL)
-		widget->definition->destroy(widget->plugin);
+	if(widget->definition != NULL && widget->dplugin != NULL)
+		widget->definition->destroy(widget->dplugin);
 	if(widget->plugin != NULL)
 		plugin_delete(widget->plugin);
 	object_delete(widget);
