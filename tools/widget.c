@@ -97,7 +97,6 @@ static int _usage(void)
 /* main */
 int main(int argc, char * argv[])
 {
-	int ret = 0;
 	int o;
 
 	gtk_init(&argc, &argv);
