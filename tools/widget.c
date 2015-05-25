@@ -66,12 +66,14 @@ static int _widget(int namec, char ** namev)
 	gtk_container_add(GTK_CONTAINER(window), box);
 	gtk_widget_show_all(window);
 	gtk_main();
+	gtk_widget_destroy(window);
 	return ret;
 }
 
 static gboolean _widget_on_closex(gpointer data)
 {
 	gtk_main_quit();
+	return TRUE;
 }
 
 
