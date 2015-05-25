@@ -44,16 +44,6 @@ DesktopMessage
 @Returns: 0 for success, -1 on errors
 
 
-<!-- ##### FUNCTION desktop_message_unregister ##### -->
-<para>
-
-</para>
-
-@window: 
-@callback: 
-@data: 
-
-
 <!-- ##### FUNCTION desktop_message_send ##### -->
 <para>
 
