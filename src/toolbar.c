@@ -54,8 +54,10 @@ GtkWidget * desktop_toolbar_create(DesktopToolbar * toolbar,
 			gtk_toolbar_insert(GTK_TOOLBAR(ret), p->widget, -1);
 			continue;
 		}
+#if !GTK_CHECK_VERSION(3, 10, 0)
 		else if(strncmp(p->stock, "gtk-", 4) == 0) /* stock icon */
 			p->widget = gtk_tool_button_new_from_stock(p->stock);
+#endif
 		else if(p->stock != NULL) /* icon name */
 		{
 			widget = gtk_image_new_from_icon_name(p->stock,
