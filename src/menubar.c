@@ -75,9 +75,11 @@ static GtkWidget * _menubar_create_menu(DesktopMenu const * menu, gpointer data,
 			menuitem = gtk_separator_menu_item_new();
 		else if(p->stock == NULL)
 			menuitem = gtk_menu_item_new_with_mnemonic(_(p->name));
+#if !GTK_CHECK_VERSION(3, 10, 0)
 		else if(strncmp(p->stock, "gtk-", 4) == 0)
 			menuitem = gtk_image_menu_item_new_from_stock(p->stock,
 					NULL);
+#endif
 		else
 			menuitem = _menubar_create_menu_from_image(p);
 		if(p->callback != NULL)
