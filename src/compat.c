@@ -45,3 +45,19 @@ void gdk_window_clear(GdkWindow * window)
 	XClearWindow(display, wid);
 }
 #endif
+
+
+# if !GTK_CHECK_VERSION(3, 0, 0)
+/* gtk_box_new */
+GtkWidget * gtk_box_new(GtkOrientation orientation, gint spacing)
+{
+	switch(orientation)
+	{
+		case GTK_ORIENTATION_HORIZONTAL:
+			return gtk_hbox_new(FALSE, spacing);
+		case GTK_ORIENTATION_VERTICAL:
+		default:
+			return gtk_vbox_new(FALSE, spacing);
+	}
+}
+# endif

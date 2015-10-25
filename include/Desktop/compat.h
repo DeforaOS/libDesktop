@@ -106,4 +106,8 @@
 void gdk_window_clear(GdkWindow * window);
 # endif
 
+# if !GTK_CHECK_VERSION(3, 0, 0)
+GtkWidget * gtk_box_new(GtkOrientation orientation, gint spacing);
+# endif
+
 #endif /* !LIBDESKTOP_DESKTOP_COMPAT_H */
