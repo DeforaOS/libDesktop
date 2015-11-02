@@ -61,3 +61,19 @@ GtkWidget * gtk_box_new(GtkOrientation orientation, gint spacing)
 	}
 }
 #endif
+
+
+#if !GTK_CHECK_VERSION(3, 0, 0)
+/* gtk_paned_new */
+GtkWidget * gtk_paned_new(GtkOrientation orientation)
+{
+	switch(orientation)
+	{
+		case GTK_ORIENTATION_HORIZONTAL:
+			return gtk_hpaned_new();
+		case GTK_ORIENTATION_VERTICAL:
+		default:
+			return gtk_vpaned_new();
+	}
+}
+#endif

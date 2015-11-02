@@ -110,4 +110,8 @@ void gdk_window_clear(GdkWindow * window);
 GtkWidget * gtk_box_new(GtkOrientation orientation, gint spacing);
 # endif
 
+# if !GTK_CHECK_VERSION(3, 0, 0)
+GtkWidget * gtk_paned_new(GtkOrientation orientation);
+# endif
+
 #endif /* !LIBDESKTOP_DESKTOP_COMPAT_H */
