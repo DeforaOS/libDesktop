@@ -118,4 +118,8 @@ GtkWidget * gtk_button_box_new(GtkOrientation orientation);
 GtkWidget * gtk_paned_new(GtkOrientation orientation);
 # endif
 
+# if !GTK_CHECK_VERSION(3, 0, 0)
+GtkWidget * gtk_separator_new(GtkOrientation orientation);
+# endif
+
 #endif /* !LIBDESKTOP_DESKTOP_COMPAT_H */

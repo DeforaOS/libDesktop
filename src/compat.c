@@ -93,3 +93,18 @@ GtkWidget * gtk_paned_new(GtkOrientation orientation)
 	}
 }
 #endif
+
+
+#if !GTK_CHECK_VERSION(3, 0, 0)
+GtkWidget * gtk_separator_new(GtkOrientation orientation)
+{
+	switch(orientation)
+	{
+		case GTK_ORIENTATION_HORIZONTAL:
+			return gtk_hseparator_new();
+		case GTK_ORIENTATION_VERTICAL:
+		default:
+			return gtk_vseparator_new();
+	}
+}
+#endif
