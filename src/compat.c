@@ -108,3 +108,13 @@ GtkWidget * gtk_separator_new(GtkOrientation orientation)
 	}
 }
 #endif
+
+
+#if !GTK_CHECK_VERSION(3, 0, 0)
+/* gtk_widget_override_font */
+void gtk_widget_override_font(GtkWidget * widget,
+		const PangoFontDescription * desc)
+{
+	gtk_widget_modify_font(widget, desc);
+}
+#endif

@@ -120,6 +120,10 @@ GtkWidget * gtk_paned_new(GtkOrientation orientation);
 
 # if !GTK_CHECK_VERSION(3, 0, 0)
 GtkWidget * gtk_separator_new(GtkOrientation orientation);
+
+# if !GTK_CHECK_VERSION(3, 0, 0)
+void gtk_widget_override_font(GtkWidget * widget,
+		const PangoFontDescription * desc);
 # endif
 
 #endif /* !LIBDESKTOP_DESKTOP_COMPAT_H */
