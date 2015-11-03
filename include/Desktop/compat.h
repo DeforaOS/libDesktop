@@ -102,26 +102,18 @@
 #  define GDK_KEY_uparrow	GDK_uparrow
 # endif
 
+/* Gtk+ 3.0 */
 # if GTK_CHECK_VERSION(3, 0, 0)
 void gdk_window_clear(GdkWindow * window);
-# endif
 
-# if !GTK_CHECK_VERSION(3, 0, 0)
 GtkWidget * gtk_box_new(GtkOrientation orientation, gint spacing);
-# endif
 
-# if !GTK_CHECK_VERSION(3, 0, 0)
 GtkWidget * gtk_button_box_new(GtkOrientation orientation);
-# endif
 
-# if !GTK_CHECK_VERSION(3, 0, 0)
 GtkWidget * gtk_paned_new(GtkOrientation orientation);
-# endif
 
-# if !GTK_CHECK_VERSION(3, 0, 0)
 GtkWidget * gtk_separator_new(GtkOrientation orientation);
 
-# if !GTK_CHECK_VERSION(3, 0, 0)
 void gtk_widget_override_font(GtkWidget * widget,
 		const PangoFontDescription * desc);
 # endif

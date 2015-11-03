@@ -33,6 +33,7 @@
 
 
 /* Compat */
+/* Gtk+ 3 */
 #if GTK_CHECK_VERSION(3, 0, 0)
 /* gdk_window_clear */
 void gdk_window_clear(GdkWindow * window)
@@ -60,10 +61,8 @@ GtkWidget * gtk_box_new(GtkOrientation orientation, gint spacing)
 			return gtk_vbox_new(FALSE, spacing);
 	}
 }
-#endif
 
 
-#if !GTK_CHECK_VERSION(3, 0, 0)
 /* gtk_button_box_new */
 GtkWidget * gtk_button_box_new(GtkOrientation orientation)
 {
@@ -76,10 +75,8 @@ GtkWidget * gtk_button_box_new(GtkOrientation orientation)
 			return gtk_vbutton_box_new();
 	}
 }
-#endif
 
 
-#if !GTK_CHECK_VERSION(3, 0, 0)
 /* gtk_paned_new */
 GtkWidget * gtk_paned_new(GtkOrientation orientation)
 {
@@ -92,10 +89,9 @@ GtkWidget * gtk_paned_new(GtkOrientation orientation)
 			return gtk_vpaned_new();
 	}
 }
-#endif
 
 
-#if !GTK_CHECK_VERSION(3, 0, 0)
+/* gtk_separator_new */
 GtkWidget * gtk_separator_new(GtkOrientation orientation)
 {
 	switch(orientation)
@@ -107,10 +103,8 @@ GtkWidget * gtk_separator_new(GtkOrientation orientation)
 			return gtk_vseparator_new();
 	}
 }
-#endif
 
 
-#if !GTK_CHECK_VERSION(3, 0, 0)
 /* gtk_widget_override_font */
 void gtk_widget_override_font(GtkWidget * widget,
 		const PangoFontDescription * desc)
