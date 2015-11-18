@@ -29,6 +29,7 @@
 
 
 #include <stdio.h>
+#include <string.h>
 #include <System.h>
 #include <gtk/gtk.h>
 #include "Desktop.h"
@@ -38,8 +39,15 @@
 
 /* Widget */
 /* private */
+/* types */
+typedef struct _WidgetPrefs
+{
+	String const * title;
+} WidgetPrefs;
+
+
 /* prototypes */
-static int _widget(int namec, char ** namev);
+static int _widget(WidgetPrefs * prefs, int namec, char ** namev);
 
 static int _error(char const * message, int ret);
 static int _usage(void);
@@ -49,7 +57,7 @@ static int _usage(void);
 /* widget */
 static gboolean _widget_on_closex(gpointer data);
 
-static int _widget(int namec, char ** namev)
+static int _widget(WidgetPrefs * prefs, int namec, char ** namev)
 {
 	int ret = 0;
 	DesktopWidget * widget;
@@ -59,6 +67,8 @@ static int _widget(int namec, char ** namev)
 	int i;
 
 	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+	if(prefs != NULL && prefs->title != NULL)
+		gtk_window_set_title(GTK_WINDOW(window), prefs->title);
 	g_signal_connect(window, "delete-event", G_CALLBACK(_widget_on_closex),
 			NULL);
 #if GTK_CHECK_VERSION(3, 0, 0)
@@ -102,7 +112,7 @@ static int _error(char const * message, int ret)
 /* usage */
 static int _usage(void)
 {
-	fputs("Usage: " PROGNAME " widget...\n", stderr);
+	fputs("Usage: " PROGNAME " [-t title] widget...\n", stderr);
 	return 1;
 }
 
@@ -111,15 +121,20 @@ static int _usage(void)
 int main(int argc, char * argv[])
 {
 	int o;
+	WidgetPrefs prefs;
 
+	memset(&prefs, 0, sizeof(prefs));
 	gtk_init(&argc, &argv);
-	while((o = getopt(argc, argv, "")) != -1)
+	while((o = getopt(argc, argv, "t:")) != -1)
 		switch(o)
 		{
+			case 't':
+				prefs.title = optarg;
+				break;
 			default:
 				return _usage();
 		}
 	if(optind == argc)
 		return _usage();
-	return (_widget(argc - optind, &argv[optind]) == 0) ? 0 : 2;
+	return (_widget(&prefs, argc - optind, &argv[optind]) == 0) ? 0 : 2;
 }
