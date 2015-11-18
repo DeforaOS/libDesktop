@@ -31,6 +31,8 @@
 #ifndef LIBDESKTOP_DESKTOP_WIDGET_H
 # define LIBDESKTOP_DESKTOP_WIDGET_H
 
+# include <stdarg.h>
+
 
 /* Widget */
 /* public */
@@ -47,6 +49,7 @@ typedef struct _DesktopWidgetDefinition
 	DesktopWidgetPlugin * (*init)(char const * name);
 	void (*destroy)(DesktopWidgetPlugin * widget);
 	GtkWidget * (*get_widget)(DesktopWidgetPlugin * widget);
+	int (*set_property)(DesktopWidgetPlugin * widget, va_list ap);
 } DesktopWidgetDefinition;
 
 
@@ -56,5 +59,7 @@ void desktop_widget_delete(DesktopWidget * widget);
 
 /* accessors */
 GtkWidget * desktop_widget_get_widget(DesktopWidget * widget);
+
+int desktop_widget_set_property(DesktopWidget * widget, ...);
 
 #endif /* !LIBDESKTOP_DESKTOP_WIDGET_H */

@@ -96,3 +96,19 @@ GtkWidget * desktop_widget_get_widget(DesktopWidget * widget)
 {
 	return widget->definition->get_widget(widget->dplugin);
 }
+
+
+/* desktop_widget_set_property */
+int desktop_widget_set_property(DesktopWidget * widget, ...)
+{
+	int ret;
+	va_list ap;
+
+	if(widget->definition->set_property == NULL)
+		return -error_set_code(1, "%s: %s", widget->definition->name,
+				"Properties not supported");
+	va_start(ap, widget);
+	ret = widget->definition->set_property(widget->dplugin, ap);
+	va_end(ap);
+	return ret;
+}
