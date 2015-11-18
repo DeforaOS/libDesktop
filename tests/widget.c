@@ -32,7 +32,9 @@
 #include <System.h>
 #include "Desktop.h"
 
-#define PROGNAME	"widget"
+#ifndef PROGNAME
+# define PROGNAME	"widget"
+#endif
 
 
 /* Widget */
