@@ -50,7 +50,7 @@
 		<cmdsynopsis>
 			<command>&name;</command>
 			<arg choice="opt"><option>-t</option>
-				<replaceable>device</replaceable></arg>
+				<replaceable>title</replaceable></arg>
 			<arg choice="plain" rep="repeat">widget</arg>
 		</cmdsynopsis>
 	</refsynopsisdiv>
@@ -71,6 +71,17 @@
 				</listitem>
 			</varlistentry>
 		</variablelist>
+	</refsect1>
+	<refsect1 id="files">
+		<title>Files</title>
+		<para>
+			<variablelist>
+				<varlistentry>
+					<term><filename>@PREFIX@/lib/Desktop/widget</filename></term>
+					<listitem><para>Path to the widget plug-ins</para></listitem>
+				</varlistentry>
+			</variablelist>
+		</para>
 	</refsect1>
 	<refsect1 id="bugs">
 		<title>Bugs</title>
