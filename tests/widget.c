@@ -70,7 +70,7 @@ static int _widget(char const * name)
 static int _error(char const * message, int ret)
 {
 	fprintf(stderr, PROGNAME ": %s%s%s\n", (message != NULL) ? message : "",
-			(message != NULL) ? ": " : "", error_get());
+			(message != NULL) ? ": " : "", error_get(NULL));
 	return ret;
 }
 
