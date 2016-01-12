@@ -220,6 +220,7 @@ static GdkFilterReturn _desktop_message_on_callback(GdkXEvent * xevent,
 	uint32_t value1;
 	uint32_t value2;
 	uint32_t value3;
+	(void) event;
 
 	if(xev->type != ClientMessage)
 		return GDK_FILTER_CONTINUE;
