@@ -230,6 +230,8 @@ static GdkFilterReturn _desktop_message_on_callback(GdkXEvent * xevent,
 	fprintf(stderr, "DEBUG: %s(%lu %lu %p)\n", __func__, xcme->serial,
 			xcme->window, (void *)mc);
 # endif
+	if(mc->atom != xcme->message_type)
+		return GDK_FILTER_CONTINUE;
 #else
 # ifdef DEBUG
 	fprintf(stderr, "DEBUG: %s(%lu %lu %p) %lu\n", __func__, xcme->serial,
