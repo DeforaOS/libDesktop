@@ -37,7 +37,9 @@
 #include <string.h>
 #include <errno.h>
 #include <gtk/gtk.h>
-#if !GTK_CHECK_VERSION(3, 0, 0)
+#if GTK_CHECK_VERSION(3, 0, 0)
+# include <gtk/gtkx.h>
+#else
 # include <gdk/gdkx.h>
 #endif
 #include <System.h>
@@ -45,14 +47,17 @@
 
 
 /* Message */
-#if !GTK_CHECK_VERSION(3, 0, 0)
 /* private */
 /* types */
 typedef struct _MessageCallback
 {
 	GtkWidget * window;
+#if GTK_CHECK_VERSION(3, 0, 0)
+	Atom atom;
+#else
 	GtkWidget * widget;
 	Window xwindow;
+#endif
 	DesktopMessageCallback callback;
 	void * data;
 } MessageCallback;
@@ -61,15 +66,12 @@ typedef struct _MessageCallback
 /* variables */
 static MessageCallback ** _callbacks = NULL;
 static size_t _callbacks_cnt = 0;
-#endif
 
 
 /* prototypes */
 /* callbacks */
-#if !GTK_CHECK_VERSION(3, 0, 0)
 static GdkFilterReturn _desktop_message_on_callback(GdkXEvent * xevent,
 		GdkEvent * event, gpointer data);
-#endif
 
 
 /* public */
@@ -78,22 +80,31 @@ static GdkFilterReturn _desktop_message_on_callback(GdkXEvent * xevent,
 int desktop_message_register(GtkWidget * window, char const * destination,
 		DesktopMessageCallback callback, void * data)
 {
-#if !GTK_CHECK_VERSION(3, 0, 0)
 	MessageCallback ** p;
 	MessageCallback * mc;
 	GdkWindow * gwindow;
+#if !GTK_CHECK_VERSION(3, 0, 0)
 	GdkAtom atom;
+#endif
 
-# ifdef DEBUG
+#ifdef DEBUG
 	fprintf(stderr, "DEBUG: %s(%p, \"%s\", %p, %p)\n", __func__, window,
 			destination, callback, data);
-# endif
+#endif
 	if((p = realloc(_callbacks, sizeof(*p) * (_callbacks_cnt + 1))) == NULL)
 		return -1;
 	_callbacks = p;
 	if((mc = object_new(sizeof(*mc))) == NULL)
 		return -1;
 	_callbacks[_callbacks_cnt++] = mc;
+	mc->callback = callback;
+	mc->data = data;
+#if GTK_CHECK_VERSION(3, 0, 0)
+	mc->atom = XInternAtom(gdk_x11_get_default_xdisplay(), destination,
+			FALSE);
+	gwindow = (window != NULL) ? gtk_widget_get_window(window) : NULL;
+	gdk_window_add_filter(gwindow, _desktop_message_on_callback, mc);
+#else
 	if((mc->window = window) == NULL)
 	{
 		mc->widget = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -103,15 +114,10 @@ int desktop_message_register(GtkWidget * window, char const * destination,
 		mc->widget = window;
 	gwindow = gtk_widget_get_window(mc->widget);
 	mc->xwindow = GDK_WINDOW_XWINDOW(gwindow);
-	mc->callback = callback;
-	mc->data = data;
 	atom = gdk_atom_intern(destination, FALSE);
 	gdk_add_client_message_filter(atom, _desktop_message_on_callback, mc);
-	return 0;
-#else
-	/* FIXME implement another method */
-	return -1;
 #endif
+	return 0;
 }
 
 
@@ -119,7 +125,28 @@ int desktop_message_register(GtkWidget * window, char const * destination,
 int desktop_message_send(char const * destination, uint32_t value1,
 		uint32_t value2, uint32_t value3)
 {
-#if !GTK_CHECK_VERSION(3, 0, 0)
+#if GTK_CHECK_VERSION(3, 0, 0)
+	XEvent xev;
+	XClientMessageEvent * xcme = &xev.xclient;
+
+	memset(&xev, 0, sizeof(xev));
+	xev.type = ClientMessage;
+	xcme->serial = 0;
+	xcme->send_event = True;
+	xcme->message_type = XInternAtom(gdk_x11_get_default_xdisplay(),
+			destination, FALSE);
+	xcme->format = 32;
+	xcme->data.l[0] = value1;
+	xcme->data.l[1] = value2;
+	xcme->data.l[2] = value3;
+	gdk_error_trap_push();
+	XSendEvent(gdk_x11_get_default_xdisplay(),
+			gdk_x11_get_default_root_xwindow(), False,
+			StructureNotifyMask | /* FIXME check the mask */
+			SubstructureNotifyMask | SubstructureRedirectMask,
+			&xev);
+	return (gdk_error_trap_pop() == 0) ? 0 : -1;
+#else
 	GdkAtom atom;
 	GdkEvent event;
 	GdkEventClient * client = &event.client;
@@ -135,11 +162,8 @@ int desktop_message_send(char const * destination, uint32_t value1,
 	client->data.l[1] = value2;
 	client->data.l[2] = value3;
 	gdk_event_send_clientmessage_toall(&event);
-#else
-	/* FIXME implement another method */
-	return -1;
-#endif
 	return 0;
+#endif
 }
 
 
@@ -147,7 +171,6 @@ int desktop_message_send(char const * destination, uint32_t value1,
 void desktop_message_unregister(GtkWidget * window,
 		DesktopMessageCallback callback, void * data)
 {
-#if !GTK_CHECK_VERSION(3, 0, 0)
 	size_t i;
 	MessageCallback ** p;
 	MessageCallback * mc;
@@ -166,25 +189,27 @@ void desktop_message_unregister(GtkWidget * window,
 	}
 	if(i == _callbacks_cnt)
 		return;
+#if GTK_CHECK_VERSION(3, 0, 0)
+	w = (window != NULL) ? gtk_widget_get_window(window) : NULL;
+#else
 	w = gtk_widget_get_window(mc->widget);
+#endif
 	gdk_window_remove_filter(w, _desktop_message_on_callback, mc);
+#if !GTK_CHECK_VERSION(3, 0, 0)
 	if(mc->window == NULL)
 		gtk_widget_destroy(mc->widget);
+#endif
 	object_delete(mc);
 	p = &_callbacks[i];
 	memmove(p, p + 1, sizeof(*p) * (_callbacks_cnt - i - 1));
 	if((p = realloc(_callbacks, sizeof(*p) * (--_callbacks_cnt))) != NULL
 			|| _callbacks_cnt == 0)
 		_callbacks = p;
-#else
-	/* FIXME implement another method */
-#endif
 }
 
 
 /* private */
 /* callbacks */
-#if !GTK_CHECK_VERSION(3, 0, 0)
 /* desktop_message_on_callback */
 static GdkFilterReturn _desktop_message_on_callback(GdkXEvent * xevent,
 		GdkEvent * event, gpointer data)
@@ -199,16 +224,23 @@ static GdkFilterReturn _desktop_message_on_callback(GdkXEvent * xevent,
 	if(xev->type != ClientMessage)
 		return GDK_FILTER_CONTINUE;
 	xcme = &xev->xclient;
+#if GTK_CHECK_VERSION(3, 0, 0)
+# ifdef DEBUG
+	fprintf(stderr, "DEBUG: %s(%lu %lu %p)\n", __func__, xcme->serial,
+			xcme->window, (void *)mc);
+# endif
+#else
 # ifdef DEBUG
 	fprintf(stderr, "DEBUG: %s(%lu %lu %p) %lu\n", __func__, xcme->serial,
-			xcme->window, mc, mc->xwindow);
+			xcme->window, mc, (void *)mc->xwindow);
 # endif
 	if(mc->xwindow != xcme->window)
 		return GDK_FILTER_CONTINUE;
-# ifdef DEBUG
-	fprintf(stderr, "DEBUG: %s() %p(%p)\n", __func__, mc->callback,
-			mc->data);
-# endif
+#endif
+#ifdef DEBUG
+	fprintf(stderr, "DEBUG: %s() %p(%p)\n", __func__, (void *)mc->callback,
+			(void *)mc->data);
+#endif
 	value1 = xcme->data.l[0];
 	value2 = xcme->data.l[1];
 	value3 = xcme->data.l[2];
@@ -217,4 +249,3 @@ static GdkFilterReturn _desktop_message_on_callback(GdkXEvent * xevent,
 	desktop_message_unregister(mc->window, mc->callback, mc->data);
 	return GDK_FILTER_REMOVE;
 }
-#endif
