@@ -24,6 +24,7 @@
 
 
 #variables
+PACKAGE="libDesktop"
 PKG_CONFIG_PATH="$OBJDIR../data:$PKG_CONFIG_PATH"
 PKG_CONFIG_PATH="${PKG_CONFIG_PATH%:}"
 #executables
@@ -43,14 +44,14 @@ _pkgconfig()
 	return $ret
 }
 
-_pkgconfig "EXISTS:" --exists libSystem || exit 2
+_pkgconfig "EXISTS:" --exists "$PACKAGE" || exit 2
 
 ret=0
 
-_pkgconfig "VERSION:" --modversion libSystem || ret=3
-_pkgconfig "CFLAGS:	" --cflags libSystem || ret=4
-_pkgconfig "LIBS:	" --libs libSystem || ret=5
-_pkgconfig "PROVIDES:" --print-provides libSystem || ret=6
-_pkgconfig "REQUIRES:" --print-requires libSystem || ret=7
+_pkgconfig "VERSION:" --modversion "$PACKAGE" || ret=3
+_pkgconfig "CFLAGS:	" --cflags "$PACKAGE" || ret=4
+_pkgconfig "LIBS:	" --libs "$PACKAGE" || ret=5
+_pkgconfig "PROVIDES:" --print-provides "$PACKAGE" || ret=6
+_pkgconfig "REQUIRES:" --print-requires "$PACKAGE" || ret=7
 
 exit $ret
