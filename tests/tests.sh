@@ -56,7 +56,7 @@ _run()
 	res=$?
 	if [ $res -ne 0 ]; then
 		echo "Test: $test$sep$@: FAIL (error $res)"
-		echo " FAIL" 1>&2
+		echo " FAIL (error $res)" 1>&2
 	else
 		echo "Test: $test$sep$@: PASS"
 		echo " PASS" 1>&2
@@ -68,6 +68,8 @@ _run()
 #test
 _test()
 {
+	test="$1"
+
 	_run "$@" >> "$target"
 	res=$?
 	[ $res -eq 0 ] || FAILED="$FAILED $test(error $res)"
