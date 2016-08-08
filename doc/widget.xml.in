@@ -49,8 +49,12 @@
 	<refsynopsisdiv>
 		<cmdsynopsis>
 			<command>&name;</command>
+			<arg choice="opt"><option>-h</option>
+				<replaceable>height</replaceable></arg>
 			<arg choice="opt"><option>-t</option>
 				<replaceable>title</replaceable></arg>
+			<arg choice="opt"><option>-w</option>
+				<replaceable>width</replaceable></arg>
 			<arg choice="plain" rep="repeat">widget</arg>
 		</cmdsynopsis>
 	</refsynopsisdiv>
@@ -65,9 +69,21 @@
 		<para>The following options are available:</para>
 		<variablelist>
 			<varlistentry>
+				<term><option>-h</option></term>
+				<listitem>
+					<para>Default height for the window.</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
 				<term><option>-t</option></term>
 				<listitem>
 					<para>Default title for the window.</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><option>-w</option></term>
+				<listitem>
+					<para>Default width for the window.</para>
 				</listitem>
 			</varlistentry>
 		</variablelist>
