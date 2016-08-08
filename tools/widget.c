@@ -28,8 +28,10 @@
 
 
 
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <limits.h>
 #include <System.h>
 #include <gtk/gtk.h>
 #include "Desktop.h"
@@ -43,6 +45,8 @@
 typedef struct _WidgetPrefs
 {
 	String const * title;
+	unsigned int width;
+	unsigned int height;
 } WidgetPrefs;
 
 
@@ -67,8 +71,16 @@ static int _widget(WidgetPrefs * prefs, int namec, char ** namev)
 	int i;
 
 	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-	if(prefs != NULL && prefs->title != NULL)
-		gtk_window_set_title(GTK_WINDOW(window), prefs->title);
+	if(prefs != NULL)
+	{
+		if(prefs->title != NULL)
+			gtk_window_set_title(GTK_WINDOW(window), prefs->title);
+		if(prefs->width > 0 || prefs->height > 0)
+			gtk_window_set_default_size(GTK_WINDOW(window),
+					(prefs->width != 0) ? prefs->width : -1,
+					(prefs->height != 0)
+					? prefs->height : -1);;
+	}
 	g_signal_connect(window, "delete-event", G_CALLBACK(_widget_on_closex),
 			NULL);
 #if GTK_CHECK_VERSION(3, 0, 0)
@@ -112,7 +124,8 @@ static int _error(char const * message, int ret)
 /* usage */
 static int _usage(void)
 {
-	fputs("Usage: " PROGNAME " [-t title] widget...\n", stderr);
+	fputs("Usage: " PROGNAME " [-h height][-t title][-w width] widget...\n",
+			stderr);
 	return 1;
 }
 
@@ -122,14 +135,25 @@ int main(int argc, char * argv[])
 {
 	int o;
 	WidgetPrefs prefs;
+	char * p;
 
 	memset(&prefs, 0, sizeof(prefs));
 	gtk_init(&argc, &argv);
-	while((o = getopt(argc, argv, "t:")) != -1)
+	while((o = getopt(argc, argv, "h:t:w:")) != -1)
 		switch(o)
 		{
+			case 'h':
+				prefs.height = strtoul(optarg, &p, 0);
+				if(optarg[0] == '\0' || *p != '\0')
+					return _usage();
+				break;
 			case 't':
 				prefs.title = optarg;
+				break;
+			case 'w':
+				prefs.width = strtoul(optarg, &p, 0);
+				if(optarg[0] == '\0' || *p != '\0')
+					return _usage();
 				break;
 			default:
 				return _usage();
