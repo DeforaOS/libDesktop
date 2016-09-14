@@ -75,6 +75,11 @@ GtkWidget * desktop_toolbar_create(DesktopToolbar * toolbar,
 			gtk_widget_add_accelerator(GTK_WIDGET(p->widget),
 					"clicked", accel, p->accel, p->modifier,
 					GTK_ACCEL_VISIBLE);
+#if 0 /* GTK_CHECK_VERSION(2, 12, 0) */
+		/* XXX the default is returned instead of the configuration */
+		if(gtk_toolbar_get_style(GTK_TOOLBAR(ret)) == GTK_TOOLBAR_ICONS)
+			gtk_tool_item_set_tooltip_text(p->widget, p->name);
+#endif
 		gtk_toolbar_insert(GTK_TOOLBAR(ret), p->widget, -1);
 	}
 	return ret;
