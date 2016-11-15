@@ -55,7 +55,7 @@ typedef struct _WidgetPrefs
 static int _widget(WidgetPrefs * prefs, int namec, char ** namev);
 
 static int _error(char const * message, int ret);
-static int _usage(void);
+static int _usage(char const * error);
 
 
 /* functions */
@@ -122,8 +122,10 @@ static int _error(char const * message, int ret)
 
 
 /* usage */
-static int _usage(void)
+static int _usage(char const * error)
 {
+	if(error != NULL)
+		fprintf(stderr, "%s: %s\n", PROGNAME, error);
 	fputs("Usage: " PROGNAME " [-h height][-t title][-w width] widget...\n",
 			stderr);
 	return 1;
@@ -143,22 +145,34 @@ int main(int argc, char * argv[])
 		switch(o)
 		{
 			case 'h':
+				errno = 0;
 				prefs.height = strtol(optarg, &p, 0);
 				if(optarg[0] == '\0' || *p != '\0')
-					return _usage();
+					return _usage(NULL);
+				else if(errno != 0)
+					return _usage(strerror(errno));
+				else if(prefs.height < 0)
+					return _usage("width must be strictly"
+							" positive");
 				break;
 			case 't':
 				prefs.title = optarg;
 				break;
 			case 'w':
+				errno = 0;
 				prefs.width = strtol(optarg, &p, 0);
 				if(optarg[0] == '\0' || *p != '\0')
-					return _usage();
+					return _usage(NULL);
+				else if(errno != 0)
+					return _usage(strerror(errno));
+				else if(prefs.width < 0)
+					return _usage("height must be strictly"
+							" positive");
 				break;
 			default:
-				return _usage();
+				return _usage(NULL);
 		}
 	if(optind == argc)
-		return _usage();
+		return _usage(NULL);
 	return (_widget(&prefs, argc - optind, &argv[optind]) == 0) ? 0 : 2;
 }
