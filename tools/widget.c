@@ -79,7 +79,7 @@ static int _widget(WidgetPrefs * prefs, int namec, char ** namev)
 			gtk_window_set_default_size(GTK_WINDOW(window),
 					(prefs->width != 0) ? prefs->width : -1,
 					(prefs->height != 0)
-					? prefs->height : -1);;
+					? prefs->height : -1);
 	}
 	g_signal_connect(window, "delete-event", G_CALLBACK(_widget_on_closex),
 			NULL);
