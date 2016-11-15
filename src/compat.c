@@ -43,7 +43,9 @@ void gdk_window_clear(GdkWindow * window)
 
 	display = gdk_x11_get_default_xdisplay();
 	wid = gdk_x11_window_get_xid(window);
+	gdk_error_trap_push();
 	XClearWindow(display, wid);
+	gdk_error_trap_pop();
 }
 #endif
 
