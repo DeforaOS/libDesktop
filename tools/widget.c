@@ -32,6 +32,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <limits.h>
+#include <errno.h>
 #include <System.h>
 #include <gtk/gtk.h>
 #include "Desktop.h"
@@ -45,8 +46,8 @@
 typedef struct _WidgetPrefs
 {
 	String const * title;
-	unsigned int width;
-	unsigned int height;
+	int width;
+	int height;
 } WidgetPrefs;
 
 
@@ -78,8 +79,7 @@ static int _widget(WidgetPrefs * prefs, int namec, char ** namev)
 		if(prefs->width > 0 || prefs->height > 0)
 			gtk_window_set_default_size(GTK_WINDOW(window),
 					(prefs->width != 0) ? prefs->width : -1,
-					(prefs->height != 0)
-					? prefs->height : -1);
+					(prefs->height != 0) ? prefs->height : -1);
 	}
 	g_signal_connect(window, "delete-event", G_CALLBACK(_widget_on_closex),
 			NULL);
@@ -143,7 +143,7 @@ int main(int argc, char * argv[])
 		switch(o)
 		{
 			case 'h':
-				prefs.height = strtoul(optarg, &p, 0);
+				prefs.height = strtol(optarg, &p, 0);
 				if(optarg[0] == '\0' || *p != '\0')
 					return _usage();
 				break;
@@ -151,7 +151,7 @@ int main(int argc, char * argv[])
 				prefs.title = optarg;
 				break;
 			case 'w':
-				prefs.width = strtoul(optarg, &p, 0);
+				prefs.width = strtol(optarg, &p, 0);
 				if(optarg[0] == '\0' || *p != '\0')
 					return _usage();
 				break;
