@@ -37,7 +37,7 @@
 #include <gtk/gtk.h>
 #include "Desktop.h"
 
-#define PROGNAME	"widget"
+#define PROGNAME_WIDGET	"widget"
 
 
 /* Widget */
@@ -115,7 +115,8 @@ static gboolean _widget_on_closex(gpointer data)
 /* error */
 static int _error(char const * message, int ret)
 {
-	fprintf(stderr, PROGNAME ": %s%s%s\n", (message != NULL) ? message : "",
+	fprintf(stderr, PROGNAME_WIDGET ": %s%s%s\n",
+			(message != NULL) ? message : "",
 			(message != NULL) ? ": " : "", error_get(NULL));
 	return ret;
 }
@@ -125,9 +126,9 @@ static int _error(char const * message, int ret)
 static int _usage(char const * error)
 {
 	if(error != NULL)
-		fprintf(stderr, "%s: %s\n", PROGNAME, error);
-	fputs("Usage: " PROGNAME " [-h height][-t title][-w width] widget...\n",
-			stderr);
+		fprintf(stderr, "%s: %s\n", PROGNAME_WIDGET, error);
+	fputs("Usage: " PROGNAME_WIDGET " [-h height][-t title][-w width]"
+			" widget...\n", stderr);
 	return 1;
 }
 
