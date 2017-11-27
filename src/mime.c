@@ -105,7 +105,7 @@ Mime * mime_new(GtkIconTheme * theme)
 	size_t i;
 	char ** q;
 
-	if((mime = malloc(sizeof(*mime))) == NULL)
+	if((mime = object_new(sizeof(*mime))) == NULL)
 		return NULL;
 	if(theme == NULL)
 		theme = gtk_icon_theme_get_default();
@@ -116,7 +116,7 @@ Mime * mime_new(GtkIconTheme * theme)
 	if(fp == NULL)
 	{
 		error_set_code(1, "%s", "Could not load MIME globs");
-		free(mime);
+		object_delete(mime);
 		return NULL;
 	}
 	mime->types = NULL;
@@ -219,7 +219,7 @@ void mime_delete(Mime * mime)
 	free(mime->types);
 	if(mime->config != NULL)
 		config_delete(mime->config);
-	free(mime);
+	object_delete(mime);
 }
 
 
