@@ -33,6 +33,13 @@
 #include <string.h>
 #include "Desktop.h"
 
+#ifndef PREFIX
+# define PREFIX		"/usr/local"
+#endif
+#ifndef DATADIR
+# define DATADIR	PREFIX "/share"
+#endif
+
 
 /* private */
 /* constants */
@@ -269,7 +276,7 @@ int mimehandler_load_by_name(MimeHandler * handler, String const * name)
 		return ret;
 	/* read through every XDG application folder */
 	if((path = getenv("XDG_DATA_DIRS")) == NULL || strlen(path) == 0)
-		path = "/usr/local/share:/usr/share";
+		path = "/usr/local/share:" DATADIR ":/usr/share";
 	if((p = string_new(path)) == NULL)
 		return -1;
 	for(q = strtok_r(p, ":", &last); q != NULL;
