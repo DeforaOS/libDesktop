@@ -109,7 +109,7 @@ target="$1"
 
 [ "$clean" -ne 0 ]			&& exit 0
 
-tests="pkgconfig.sh"
+tests="mimehandler pkgconfig.sh"
 failures=
 
 $DATE > "$target"
