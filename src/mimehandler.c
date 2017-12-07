@@ -183,6 +183,51 @@ MimeHandlerType mimehandler_get_type(MimeHandler * handler)
 }
 
 
+/* mimehandler_get_types */
+String ** mimehandler_get_types(MimeHandler * handler)
+{
+	String ** ret = NULL;
+	size_t cnt = 0;
+	size_t i;
+	String const * p;
+	String * q;
+	String * last;
+	String ** r;
+
+	if(mimehandler_get_type(handler) != MIME_HANDLER_TYPE_APPLICATION)
+		return NULL;
+	if((p = config_get(handler, SECTION, "MimeType")) == NULL)
+	{
+		if((ret = malloc(sizeof(String *))) == NULL)
+			return NULL;
+		ret[0] = NULL;
+		return ret;
+	}
+	if((q = string_new(p)) == NULL)
+		return NULL;
+	for(p = strtok_r(q, ":", &last); p != NULL;
+			p = strtok_r(NULL, ":", &last))
+	{
+		if((r = realloc(ret, sizeof(*ret) * (cnt + 1))) != NULL)
+		{
+			ret = r;
+			ret[cnt] = string_new(p);
+		}
+		if(r == NULL || ret[cnt] == NULL)
+		{
+			for(i = 0; i < cnt; i++)
+				string_delete(ret[i]);
+			free(ret);
+			return NULL;
+		}
+		cnt++;
+	}
+	if(ret != NULL)
+		ret[cnt] = NULL;
+	return ret;
+}
+
+
 /* mimehandler_is_hidden */
 int mimehandler_is_hidden(MimeHandler * handler)
 {

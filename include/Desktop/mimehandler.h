@@ -60,6 +60,7 @@ int mimehandler_can_execute(MimeHandler * handler);
 String const * mimehandler_get_name(MimeHandler * handler);
 String const * mimehandler_get_program(MimeHandler * handler);
 MimeHandlerType mimehandler_get_type(MimeHandler * handler);
+String ** mimehandler_get_types(MimeHandler * handler);
 
 int mimehandler_is_hidden(MimeHandler * handler);
 
