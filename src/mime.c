@@ -225,7 +225,7 @@ void mime_delete(Mime * mime)
 
 /* accessors */
 /* mime_get_handler */
-char const * mime_get_handler(Mime * mime, char const * type,
+MimeHandler * mime_get_handler(Mime * mime, char const * type,
 		char const * action)
 {
 	char const * program;
@@ -250,7 +250,7 @@ char const * mime_get_handler(Mime * mime, char const * type,
 	q[2] = '\0';
 	program = config_get(mime->config, p, action);
 	free(p);
-	return program;
+	return mimehandler_new_load(program);
 }
 
 

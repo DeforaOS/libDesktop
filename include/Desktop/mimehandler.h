@@ -1,5 +1,5 @@
 /* $Id$ */
-/* Copyright (c) 2011-2012 Pierre Pronchery <khorben@defora.org> */
+/* Copyright (c) 2017 Pierre Pronchery <khorben@defora.org> */
 /* This file is part of DeforaOS Desktop libDesktop */
 /* All rights reserved.
  *
@@ -28,43 +28,43 @@
 
 
 
-#ifndef LIBDESKTOP_DESKTOP_MIME_H
-# define LIBDESKTOP_DESKTOP_MIME_H
+#ifndef LIBDESKTOP_DESKTOP_MIMEHANDLER_H
+# define LIBDESKTOP_DESKTOP_MIMEHANDLER_H
 
-# include <gtk/gtk.h>
-# include "mimehandler.h"
+# include <System/config.h>
+# include <System/string.h>
 
 
-/* Mime */
+/* MimeHandler */
 /* types */
-typedef struct _Mime Mime;
+typedef struct _Hash MimeHandler;
 
-typedef void (*MimeForeachCallback)(void * data, char const * name,
-		GdkPixbuf * icon_24, GdkPixbuf * icon_48, GdkPixbuf * icon_96);
+typedef enum _MimeHandlerType
+{
+	MIME_HANDLER_TYPE_UNKNOWN = 0,
+	MIME_HANDLER_TYPE_APPLICATION,
+	MIME_HANDLER_TYPE_DIRECTORY,
+	MIME_HANDLER_TYPE_URL
+} MimeHandlerType;
 
 
 /* functions */
-Mime * mime_new(GtkIconTheme * theme);
-void mime_delete(Mime * mime);
+MimeHandler * mimehandler_new(void);
+MimeHandler * mimehandler_new_load(String const * name);
+void mimehandler_delete(MimeHandler * handler);
 
 /* accessors */
-MimeHandler * mime_get_handler(Mime * mime, char const * type,
-		char const * action);
-int mime_set_handler(Mime * mime, char const * type, char const * action,
-		char const * handler);
-void mime_set_theme(Mime * mime, GtkIconTheme * theme);
+int mimehandler_can_display(MimeHandler * handler);
+int mimehandler_can_execute(MimeHandler * handler);
+
+String const * mimehandler_get_name(MimeHandler * handler);
+String const * mimehandler_get_program(MimeHandler * handler);
+MimeHandlerType mimehandler_get_type(MimeHandler * handler);
+
+int mimehandler_is_hidden(MimeHandler * handler);
 
 /* useful */
-char const * mime_type(Mime * mime, char const * path);
-/* FIXME return an enum with error codes? */
-int mime_action(Mime * mime, char const * action, char const * path);
-int mime_action_type(Mime * mime, char const * action, char const * path,
-		char const * type);
+int mimehandler_load_by_name(MimeHandler * handler, String const * name);
+int mimehandler_save(MimeHandler * handler);
 
-void mime_foreach(Mime * mime, MimeForeachCallback callback, void * data);
-
-void mime_icons(Mime * mime, char const * type, ...);
-
-int mime_save(Mime * mime);
-
-#endif /* !LIBDESKTOP_DESKTOP_MIME_H */
+#endif /* !LIBDESKTOP_DESKTOP_MIMEHANDLER_H */
