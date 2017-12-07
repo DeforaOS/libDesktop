@@ -39,6 +39,7 @@ int main(void)
 {
 	MimeHandler * handler;
 	char * path;
+	String ** types;
 
 	if((path = getcwd(NULL, 0)) == NULL)
 		return 2;
@@ -55,6 +56,21 @@ int main(void)
 		mimehandler_delete(handler);
 		return 5;
 	}
+	if(mimehandler_get_types(handler) != NULL)
+	{
+		mimehandler_delete(handler);
+		return 6;
+	}
+	mimehandler_delete(handler);
+	if((handler = mimehandler_new_load("Widget")) == NULL)
+		return 7;
+	if((types = mimehandler_get_types(handler)) == NULL
+			|| types[0] != NULL)
+	{
+		mimehandler_delete(handler);
+		return 8;
+	}
+	free(types);
 	mimehandler_delete(handler);
 	return 0;
 }
