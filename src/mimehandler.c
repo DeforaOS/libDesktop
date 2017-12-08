@@ -72,6 +72,22 @@ MimeHandler * mimehandler_new_load(String const * name)
 }
 
 
+/* mimehandler_new_open */
+MimeHandler * mimehandler_new_open(String const * filename)
+{
+	MimeHandler * handler;
+
+	if((handler = mimehandler_new()) == NULL)
+		return NULL;
+	if(mimehandler_load(handler, filename) != 0)
+	{
+		mimehandler_delete(handler);
+		return NULL;
+	}
+	return handler;
+}
+
+
 /* mimehandler_delete */
 void mimehandler_delete(MimeHandler * handler)
 {
@@ -102,9 +118,10 @@ int mimehandler_can_execute(MimeHandler * handler)
 
 	if(mimehandler_get_type(handler) != MIME_HANDLER_TYPE_APPLICATION)
 		return 0;
-	if((p = config_get(handler, SECTION, "TryExec")) == NULL)
-		return 1;
-	return _can_execute_access(p, X_OK);
+	if((p = config_get(handler, SECTION, "TryExec")) != NULL
+			&& _can_execute_access(p, X_OK) == 0)
+		return 0;
+	return (config_get(handler, SECTION, "Exec") != NULL) ? 1 : 0;
 }
 
 static int _can_execute_access(String const * path, int mode)
@@ -141,10 +158,65 @@ static int _can_execute_access_path(String const * path,
 }
 
 
+/* mimehandler_can_open */
+int mimehandler_can_open(MimeHandler * handler)
+{
+	switch(mimehandler_get_type(handler))
+	{
+		case MIME_HANDLER_TYPE_APPLICATION:
+			return mimehandler_can_execute(handler);
+		case MIME_HANDLER_TYPE_DIRECTORY:
+			/* let errors be handled by the API user */
+			return 1;
+		case MIME_HANDLER_TYPE_URL:
+			/* FIXME implement */
+			return 0;
+		case MIME_HANDLER_TYPE_UNKNOWN:
+			return 0;
+	}
+	return 0;
+}
+
+
+/* mimehandler_get_comment */
+String const * mimehandler_get_comment(MimeHandler * handler)
+{
+	return config_get(handler, SECTION, "Comment");
+}
+
+
+/* mimehandler_get_generic_name */
+String const * mimehandler_get_generic_name(MimeHandler * handler)
+{
+	return config_get(handler, SECTION, "GenericName");
+}
+
+
+/* mimehandler_get_icon */
+String const * mimehandler_get_icon(MimeHandler * handler)
+{
+	return config_get(handler, SECTION, "Icon");
+}
+
+
 /* mimehandler_get_name */
 String const * mimehandler_get_name(MimeHandler * handler)
 {
 	return config_get(handler, SECTION, "Name");
+}
+
+
+/* mimehandler_get_path */
+String const * mimehandler_get_path(MimeHandler * handler)
+{
+	switch(mimehandler_get_type(handler))
+	{
+		case MIME_HANDLER_TYPE_APPLICATION:
+		case MIME_HANDLER_TYPE_DIRECTORY:
+			return config_get(handler, SECTION, "Path");
+		default:
+			return NULL;
+	}
 }
 
 
@@ -235,6 +307,15 @@ String ** mimehandler_get_types(MimeHandler * handler)
 }
 
 
+/* mimehandler_get_url */
+String const * mimehandler_get_url(MimeHandler * handler)
+{
+	if(mimehandler_get_type(handler) == MIME_HANDLER_TYPE_URL)
+		return config_get(handler, SECTION, "URL");
+	return NULL;
+}
+
+
 /* mimehandler_is_hidden */
 int mimehandler_is_hidden(MimeHandler * handler)
 {
@@ -247,6 +328,19 @@ int mimehandler_is_hidden(MimeHandler * handler)
 
 
 /* useful */
+/* mimehandler_load */
+int mimehandler_load(MimeHandler * handler, String const * filename)
+{
+	return (config_reset(handler) == 0
+			&& config_load(handler, filename) == 0
+			&& mimehandler_get_type(handler)
+				!= MIME_HANDLER_TYPE_UNKNOWN
+			&& mimehandler_get_name(handler) != NULL
+			&& mimehandler_is_hidden(handler) == 0)
+		? 0 : -1;
+}
+
+
 /* mimehandler_load_by_name */
 static int _load_by_name_path(MimeHandler * handler, String const * name,
 		String const * path);
@@ -292,18 +386,12 @@ static int _load_by_name_path(MimeHandler * handler, String const * name,
 {
 	int ret;
 	String const applications[] = "/applications/";
-	String * pathname;
+	String * filename;
 
-	if((pathname = string_new_append(path, applications, name, EXTENSION,
+	if((filename = string_new_append(path, applications, name, EXTENSION,
 					NULL)) == NULL)
 		return -1;
-	ret = (config_reset(handler) == 0
-			&& config_load(handler, pathname) == 0
-			&& mimehandler_get_type(handler)
-				!= MIME_HANDLER_TYPE_UNKNOWN
-			&& mimehandler_get_name(handler) != NULL
-			&& mimehandler_is_hidden(handler) == 0)
-		? 0 : -1;
-	string_delete(pathname);
+	ret = mimehandler_load(handler, filename);
+	string_delete(filename);
 	return ret;
 }

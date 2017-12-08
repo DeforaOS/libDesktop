@@ -62,7 +62,8 @@ int main(void)
 		return 6;
 	}
 	mimehandler_delete(handler);
-	if((handler = mimehandler_new_load("Widget")) == NULL)
+	if((handler = mimehandler_new_open("applications/Widget.desktop"))
+			== NULL)
 		return 7;
 	if((types = mimehandler_get_types(handler)) == NULL
 			|| types[0] != NULL)
