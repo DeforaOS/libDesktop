@@ -287,6 +287,8 @@ String ** mimehandler_get_types(MimeHandler * handler)
 	for(p = strtok_r(q, ":", &last); p != NULL;
 			p = strtok_r(NULL, ":", &last))
 	{
+		if(strlen(p) == 0)
+			continue;
 		if((r = realloc(ret, sizeof(*ret) * (cnt + 1))) != NULL)
 		{
 			ret = r;
