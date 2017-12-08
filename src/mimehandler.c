@@ -116,7 +116,7 @@ int mimehandler_can_execute(MimeHandler * handler)
 {
 	String const * p;
 
-	if(mimehandler_get_type(handler) != MIME_HANDLER_TYPE_APPLICATION)
+	if(mimehandler_get_type(handler) != MIMEHANDLER_TYPE_APPLICATION)
 		return 0;
 	if((p = config_get(handler, SECTION, "TryExec")) != NULL
 			&& _can_execute_access(p, X_OK) == 0)
@@ -163,15 +163,15 @@ int mimehandler_can_open(MimeHandler * handler)
 {
 	switch(mimehandler_get_type(handler))
 	{
-		case MIME_HANDLER_TYPE_APPLICATION:
+		case MIMEHANDLER_TYPE_APPLICATION:
 			return mimehandler_can_execute(handler);
-		case MIME_HANDLER_TYPE_DIRECTORY:
+		case MIMEHANDLER_TYPE_DIRECTORY:
 			/* let errors be handled by the API user */
 			return 1;
-		case MIME_HANDLER_TYPE_URL:
+		case MIMEHANDLER_TYPE_URL:
 			/* FIXME implement */
 			return 0;
-		case MIME_HANDLER_TYPE_UNKNOWN:
+		case MIMEHANDLER_TYPE_UNKNOWN:
 			return 0;
 	}
 	return 0;
@@ -211,8 +211,8 @@ String const * mimehandler_get_path(MimeHandler * handler)
 {
 	switch(mimehandler_get_type(handler))
 	{
-		case MIME_HANDLER_TYPE_APPLICATION:
-		case MIME_HANDLER_TYPE_DIRECTORY:
+		case MIMEHANDLER_TYPE_APPLICATION:
+		case MIMEHANDLER_TYPE_DIRECTORY:
 			return config_get(handler, SECTION, "Path");
 		default:
 			return NULL;
@@ -225,12 +225,12 @@ String const * mimehandler_get_program(MimeHandler * handler)
 {
 	switch(mimehandler_get_type(handler))
 	{
-		case MIME_HANDLER_TYPE_APPLICATION:
+		case MIMEHANDLER_TYPE_APPLICATION:
 			/* XXX may be a format string */
 			return config_get(handler, SECTION, "Exec");
-		case MIME_HANDLER_TYPE_DIRECTORY:
-		case MIME_HANDLER_TYPE_UNKNOWN:
-		case MIME_HANDLER_TYPE_URL:
+		case MIMEHANDLER_TYPE_DIRECTORY:
+		case MIMEHANDLER_TYPE_UNKNOWN:
+		case MIMEHANDLER_TYPE_URL:
 			return NULL;
 	}
 	return NULL;
@@ -247,18 +247,18 @@ MimeHandlerType mimehandler_get_type(MimeHandler * handler)
 		MimeHandlerType type;
 	} types[] =
 	{
-		{ "Application",MIME_HANDLER_TYPE_APPLICATION	},
-		{ "Directory",	MIME_HANDLER_TYPE_DIRECTORY	},
-		{ "URL",	MIME_HANDLER_TYPE_URL		}
+		{ "Application",MIMEHANDLER_TYPE_APPLICATION	},
+		{ "Directory",	MIMEHANDLER_TYPE_DIRECTORY	},
+		{ "URL",	MIMEHANDLER_TYPE_URL		}
 	};
 	size_t i;
 
 	if((type = config_get(handler, SECTION, "Type")) == NULL)
-		return MIME_HANDLER_TYPE_UNKNOWN;
+		return MIMEHANDLER_TYPE_UNKNOWN;
 	for(i = 0; i < sizeof(types) / sizeof(*types); i++)
 		if(string_compare(types[i].name, type) == 0)
 			return types[i].type;
-	return MIME_HANDLER_TYPE_UNKNOWN;
+	return MIMEHANDLER_TYPE_UNKNOWN;
 }
 
 
@@ -273,7 +273,7 @@ String ** mimehandler_get_types(MimeHandler * handler)
 	String * last;
 	String ** r;
 
-	if(mimehandler_get_type(handler) != MIME_HANDLER_TYPE_APPLICATION)
+	if(mimehandler_get_type(handler) != MIMEHANDLER_TYPE_APPLICATION)
 		return NULL;
 	if((p = config_get(handler, SECTION, "MimeType")) == NULL)
 	{
@@ -310,7 +310,7 @@ String ** mimehandler_get_types(MimeHandler * handler)
 /* mimehandler_get_url */
 String const * mimehandler_get_url(MimeHandler * handler)
 {
-	if(mimehandler_get_type(handler) == MIME_HANDLER_TYPE_URL)
+	if(mimehandler_get_type(handler) == MIMEHANDLER_TYPE_URL)
 		return config_get(handler, SECTION, "URL");
 	return NULL;
 }
@@ -334,7 +334,7 @@ int mimehandler_load(MimeHandler * handler, String const * filename)
 	return (config_reset(handler) == 0
 			&& config_load(handler, filename) == 0
 			&& mimehandler_get_type(handler)
-				!= MIME_HANDLER_TYPE_UNKNOWN
+				!= MIMEHANDLER_TYPE_UNKNOWN
 			&& mimehandler_get_name(handler) != NULL
 			&& mimehandler_is_hidden(handler) == 0)
 		? 0 : -1;
