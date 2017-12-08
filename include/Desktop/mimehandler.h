@@ -37,7 +37,7 @@
 
 /* MimeHandler */
 /* types */
-typedef struct _Hash MimeHandler;
+typedef struct _MimeHandler MimeHandler;
 
 typedef enum _MimeHandlerType
 {
@@ -59,19 +59,23 @@ int mimehandler_can_display(MimeHandler * handler);
 int mimehandler_can_execute(MimeHandler * handler);
 int mimehandler_can_open(MimeHandler * handler);
 
+String const ** mimehandler_get_categories(MimeHandler * handler);
 String const * mimehandler_get_comment(MimeHandler * handler);
+String const * mimehandler_get_filename(MimeHandler * handler);
 String const * mimehandler_get_generic_name(MimeHandler * handler);
 String const * mimehandler_get_icon(MimeHandler * handler);
 String const * mimehandler_get_name(MimeHandler * handler);
 String const * mimehandler_get_path(MimeHandler * handler);
 String const * mimehandler_get_program(MimeHandler * handler);
 MimeHandlerType mimehandler_get_type(MimeHandler * handler);
-String ** mimehandler_get_types(MimeHandler * handler);
+String const ** mimehandler_get_types(MimeHandler * handler);
 String const * mimehandler_get_url(MimeHandler * handler);
 
 int mimehandler_is_hidden(MimeHandler * handler);
 
 /* useful */
+int mimehandler_execute(MimeHandler * handler, String const * filename);
+
 int mimehandler_load(MimeHandler * handler, String const * filename);
 int mimehandler_load_by_name(MimeHandler * handler, String const * name);
 int mimehandler_save(MimeHandler * handler);
