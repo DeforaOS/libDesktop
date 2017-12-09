@@ -238,7 +238,7 @@ String const ** mimehandler_get_categories(MimeHandler * handler)
 	{
 		if(strlen(p) == 0)
 			continue;
-		if((r = realloc(ret, sizeof(*ret) * (cnt + 1))) != NULL)
+		if((r = realloc(ret, sizeof(*ret) * (cnt + 2))) != NULL)
 		{
 			ret = r;
 			ret[cnt] = string_new(p);
@@ -252,6 +252,7 @@ String const ** mimehandler_get_categories(MimeHandler * handler)
 		}
 		cnt++;
 	}
+	string_delete(q);
 	if(ret != NULL)
 		ret[cnt] = NULL;
 	handler->categories = ret;
@@ -380,7 +381,7 @@ String const ** mimehandler_get_types(MimeHandler * handler)
 	{
 		if(strlen(p) == 0)
 			continue;
-		if((r = realloc(ret, sizeof(*ret) * (cnt + 1))) != NULL)
+		if((r = realloc(ret, sizeof(*ret) * (cnt + 2))) != NULL)
 		{
 			ret = r;
 			ret[cnt] = string_new(p);
@@ -394,6 +395,7 @@ String const ** mimehandler_get_types(MimeHandler * handler)
 		}
 		cnt++;
 	}
+	string_delete(q);
 	if(ret != NULL)
 		ret[cnt] = NULL;
 	handler->types = ret;
