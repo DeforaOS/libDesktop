@@ -233,8 +233,8 @@ String const ** mimehandler_get_categories(MimeHandler * handler)
 	}
 	if((q = string_new(p)) == NULL)
 		return NULL;
-	for(p = strtok_r(q, ":", &last); p != NULL;
-			p = strtok_r(NULL, ":", &last))
+	for(p = strtok_r(q, ";", &last); p != NULL;
+			p = strtok_r(NULL, ";", &last))
 	{
 		if(strlen(p) == 0)
 			continue;
