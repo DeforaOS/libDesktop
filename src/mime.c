@@ -250,7 +250,7 @@ MimeHandler * mime_get_handler(Mime * mime, char const * type,
 	q[2] = '\0';
 	program = config_get(mime->config, p, action);
 	free(p);
-	return mimehandler_new_load(program);
+	return mimehandler_new_load_by_name(program);
 }
 
 

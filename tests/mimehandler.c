@@ -49,9 +49,9 @@ int main(void)
 		return 3;
 	}
 	free(path);
-	if((handler = mimehandler_new_load("Root")) == NULL)
+	if((handler = mimehandler_new_load_by_name("Root")) == NULL)
 		return 4;
-	if(mimehandler_get_type(handler) != MIME_HANDLER_TYPE_DIRECTORY)
+	if(mimehandler_get_type(handler) != MIMEHANDLER_TYPE_DIRECTORY)
 	{
 		mimehandler_delete(handler);
 		return 5;
@@ -62,7 +62,7 @@ int main(void)
 		return 6;
 	}
 	mimehandler_delete(handler);
-	if((handler = mimehandler_new_open("applications/Widget.desktop"))
+	if((handler = mimehandler_new_load("applications/Widget.desktop"))
 			== NULL)
 		return 7;
 	if((types = mimehandler_get_types(handler)) == NULL

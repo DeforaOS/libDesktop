@@ -86,13 +86,13 @@ MimeHandler * mimehandler_new(void)
 
 
 /* mimehandler_new_load */
-MimeHandler * mimehandler_new_load(String const * name)
+MimeHandler * mimehandler_new_load(String const * filename)
 {
 	MimeHandler * handler;
 
 	if((handler = mimehandler_new()) == NULL)
 		return NULL;
-	if(mimehandler_load_by_name(handler, name) != 0)
+	if(mimehandler_load(handler, filename) != 0)
 	{
 		mimehandler_delete(handler);
 		return NULL;
@@ -101,14 +101,14 @@ MimeHandler * mimehandler_new_load(String const * name)
 }
 
 
-/* mimehandler_new_open */
-MimeHandler * mimehandler_new_open(String const * filename)
+/* mimehandler_new_load_by_name */
+MimeHandler * mimehandler_new_load_by_name(String const * name)
 {
 	MimeHandler * handler;
 
 	if((handler = mimehandler_new()) == NULL)
 		return NULL;
-	if(mimehandler_load(handler, filename) != 0)
+	if(mimehandler_load_by_name(handler, name) != 0)
 	{
 		mimehandler_delete(handler);
 		return NULL;
@@ -424,59 +424,6 @@ int mimehandler_is_hidden(MimeHandler * handler)
 
 
 /* useful */
-/* mimehandler_execute */
-int mimehandler_execute(MimeHandler * handler, String const * filename)
-{
-	/* FIXME implement filename */
-	int ret = 0;
-        String * program;
-        String * p;
-        String const * q;
-        pid_t pid;
-        GError * error = NULL;
-
-        if((q = config_get(handler->config, SECTION, "Exec")) == NULL)
-                return -1;
-        if((program = string_new(q)) == NULL)
-                return -1;
-        /* XXX crude way to ignore %f, %F, %u and %U */
-        if((p = strchr(program, '%')) != NULL)
-                *p = '\0';
-#ifdef DEBUG
-        fprintf(stderr, "DEBUG: %s() \"%s\"", __func__, program);
-#endif
-        if((q = mimehandler_get_path(handler)) == NULL)
-        {
-                /* execute the program directly */
-                if(g_spawn_command_line_async(program, &error) != TRUE)
-                {
-			error_set_code(1, "%s: %s", program, error->message);
-                        g_error_free(error);
-                }
-        }
-        else if((pid = fork()) == 0)
-        {
-                /* change the current working directory */
-                if(chdir(q) != 0)
-			error_set_code(-errno, "%s: %s: %s", program, q,
-					strerror(errno));
-                else if(g_spawn_command_line_async(program, &error) != TRUE)
-                {
-			error_set_code(1, "%s: %s", program, error->message);
-                        g_error_free(error);
-                }
-                exit(125);
-        }
-        else if(pid < 0)
-	{
-                error_set_code(-errno, "%s: %s", program, strerror(errno));
-		ret = -1;
-	}
-        string_delete(program);
-	return ret;
-}
-
-
 /* mimehandler_load */
 int mimehandler_load(MimeHandler * handler, String const * filename)
 {
@@ -552,6 +499,59 @@ static int _load_by_name_path(MimeHandler * handler, String const * name,
 		return -1;
 	ret = mimehandler_load(handler, filename);
 	string_delete(filename);
+	return ret;
+}
+
+
+/* mimehandler_open */
+int mimehandler_open(MimeHandler * handler, String const * filename)
+{
+	/* FIXME implement filename */
+	int ret = 0;
+	String * program;
+	String * p;
+	String const * q;
+	pid_t pid;
+	GError * error = NULL;
+
+	if((q = config_get(handler->config, SECTION, "Exec")) == NULL)
+		return -1;
+	if((program = string_new(q)) == NULL)
+		return -1;
+	/* XXX crude way to ignore %f, %F, %u and %U */
+	if((p = strchr(program, '%')) != NULL)
+		*p = '\0';
+#ifdef DEBUG
+	fprintf(stderr, "DEBUG: %s() \"%s\"", __func__, program);
+#endif
+	if((q = mimehandler_get_path(handler)) == NULL)
+	{
+		/* execute the program directly */
+		if(g_spawn_command_line_async(program, &error) != TRUE)
+		{
+			error_set_code(1, "%s: %s", program, error->message);
+			g_error_free(error);
+		}
+	}
+	else if((pid = fork()) == 0)
+	{
+		/* change the current working directory */
+		if(chdir(q) != 0)
+			error_set_code(-errno, "%s: %s: %s", program, q,
+					strerror(errno));
+		else if(g_spawn_command_line_async(program, &error) != TRUE)
+		{
+			error_set_code(1, "%s: %s", program, error->message);
+			g_error_free(error);
+		}
+		exit(125);
+	}
+	else if(pid < 0)
+	{
+		error_set_code(-errno, "%s: %s", program, strerror(errno));
+		ret = -1;
+	}
+	string_delete(program);
 	return ret;
 }
 

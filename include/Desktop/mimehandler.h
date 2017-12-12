@@ -50,8 +50,8 @@ typedef enum _MimeHandlerType
 
 /* functions */
 MimeHandler * mimehandler_new(void);
-MimeHandler * mimehandler_new_load(String const * name);
-MimeHandler * mimehandler_new_open(String const * filename);
+MimeHandler * mimehandler_new_load(String const * filename);
+MimeHandler * mimehandler_new_load_by_name(String const * name);
 void mimehandler_delete(MimeHandler * handler);
 
 /* accessors */
@@ -74,7 +74,7 @@ String const * mimehandler_get_url(MimeHandler * handler);
 int mimehandler_is_hidden(MimeHandler * handler);
 
 /* useful */
-int mimehandler_execute(MimeHandler * handler, String const * filename);
+int mimehandler_open(MimeHandler * handler, String const * filename);
 
 int mimehandler_load(MimeHandler * handler, String const * filename);
 int mimehandler_load_by_name(MimeHandler * handler, String const * name);
