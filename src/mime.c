@@ -193,7 +193,7 @@ static void _new_config(Mime * mime)
 	if((filename = _mime_get_config_filename()) == NULL)
 		return;
 	config_load(mime->config, filename);
-	free(filename);
+	string_delete(filename);
 }
 
 
@@ -415,7 +415,7 @@ int mime_save(Mime * mime)
 	if((filename = _mime_get_config_filename()) == NULL)
 		return -1;
 	ret = config_save(mime->config, filename);
-	free(filename);
+	string_delete(filename);
 	return ret;
 }
 
