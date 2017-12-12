@@ -38,6 +38,9 @@
 #ifndef PREFIX
 # define PREFIX		"/usr/local"
 #endif
+#ifndef BINDIR
+# define BINDIR		PREFIX "/bin"
+#endif
 #ifndef DATADIR
 # define DATADIR	PREFIX "/share"
 #endif
@@ -201,8 +204,7 @@ int mimehandler_can_open(MimeHandler * handler)
 			/* let errors be handled by the API user */
 			return 1;
 		case MIMEHANDLER_TYPE_URL:
-			/* FIXME implement */
-			return 0;
+			return 1;
 		case MIMEHANDLER_TYPE_UNKNOWN:
 			return 0;
 	}
@@ -504,9 +506,29 @@ static int _load_by_name_path(MimeHandler * handler, String const * name,
 
 
 /* mimehandler_open */
+static int _open_application(MimeHandler * handler, String const * filename);
+static int _open_directory(MimeHandler * handler, String const * filename);
+static int _open_url(MimeHandler * handler, String const * filename);
+
 int mimehandler_open(MimeHandler * handler, String const * filename)
 {
-	/* FIXME implement filename */
+	switch(mimehandler_get_type(handler))
+	{
+		case MIMEHANDLER_TYPE_APPLICATION:
+			return _open_application(handler, filename);
+		case MIMEHANDLER_TYPE_DIRECTORY:
+			return _open_directory(handler, filename);
+		case MIMEHANDLER_TYPE_URL:
+			return _open_url(handler, filename);
+		case MIMEHANDLER_TYPE_UNKNOWN:
+			/* XXX report error */
+			return -1;
+	}
+	return error_set_code(-ENOSYS, "%s", strerror(ENOSYS));
+}
+
+static int _open_application(MimeHandler * handler, String const * filename)
+{
 	int ret = 0;
 	String * program;
 	String * p;
@@ -514,6 +536,7 @@ int mimehandler_open(MimeHandler * handler, String const * filename)
 	pid_t pid;
 	GError * error = NULL;
 
+	/* FIXME implement filename */
 	if((q = config_get(handler->config, SECTION, "Exec")) == NULL)
 		return -1;
 	if((program = string_new(q)) == NULL)
@@ -552,6 +575,59 @@ int mimehandler_open(MimeHandler * handler, String const * filename)
 		ret = -1;
 	}
 	string_delete(program);
+	return ret;
+}
+
+static int _open_directory(MimeHandler * handler, String const * filename)
+{
+	int ret = 0;
+	String const * directory;
+	/* XXX open with the default file manager instead */
+	char * argv[] = { "browser", "--", NULL, NULL };
+	const unsigned int flags = G_SPAWN_SEARCH_PATH;
+	GError * error = NULL;
+
+	if(filename != NULL)
+		return error_set_code(-EINVAL, "%s", strerror(EINVAL));
+	/* XXX this may not be the correct key */
+	if((directory = mimehandler_get_path(handler)) == NULL)
+		/* XXX report an error? */
+		return 0;
+	if((argv[2] = string_new(directory)) == NULL)
+		return -1;
+	else if(g_spawn_async(NULL, argv, NULL, flags, NULL, NULL, NULL, &error)
+			!= TRUE)
+	{
+		ret = -error_set_code(1, "%s: %s", directory, error->message);
+		g_error_free(error);
+	}
+	string_delete(argv[2]);
+	return ret;
+}
+
+static int _open_url(MimeHandler * handler, String const * filename)
+{
+	int ret = 0;
+	String const * url;
+	/* XXX open with the default web browser instead */
+	char * argv[] = { BINDIR "/htmlapp", "--", NULL, NULL };
+	unsigned int flags = 0;
+	GError * error = NULL;
+
+	if(filename != NULL)
+		return error_set_code(-EINVAL, "%s", strerror(EINVAL));
+	if((url = mimehandler_get_url(handler)) == NULL)
+		/* XXX report an error? */
+		return 0;
+	if((argv[2] = string_new(url)) == NULL)
+		return -1;
+	else if(g_spawn_async(NULL, argv, NULL, flags, NULL, NULL, NULL, &error)
+			!= TRUE)
+	{
+		ret = -error_set_code(1, "%s: %s", url, error->message);
+		g_error_free(error);
+	}
+	string_delete(argv[2]);
 	return ret;
 }
 
