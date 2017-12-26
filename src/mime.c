@@ -228,6 +228,7 @@ void mime_delete(Mime * mime)
 MimeHandler * mime_get_handler(Mime * mime, char const * type,
 		char const * action)
 {
+	MimeHandler * handler;
 	String const * program;
 	String * p;
 	String * q;
@@ -240,13 +241,10 @@ MimeHandler * mime_get_handler(Mime * mime, char const * type,
 		error_set_code(-EINVAL, "%s", strerror(EINVAL));
 		return NULL;
 	}
-	if((program = config_get(mime->config, type, action)) != NULL)
-	{
-#ifdef DEBUG
-		fprintf(stderr, "DEBUG: %s() => \"%s\"\n", __func__, program);
-#endif
-		return program;
-	}
+	if((program = config_get(mime->config, type, action)) != NULL
+			&& (handler = mimehandler_new_load_by_name(program))
+			!= NULL)
+		return handler;
 	/* generic fallback */
 	if((p = string_find(type, "/")) == NULL || *(++p) == '\0'
 			|| (p = string_new(type)) == NULL)
