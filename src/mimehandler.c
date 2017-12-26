@@ -194,12 +194,14 @@ static int _can_execute_access_path(String const * path,
 
 
 /* mimehandler_can_open */
+static int _can_open_application(MimeHandler * handler);
+
 int mimehandler_can_open(MimeHandler * handler)
 {
 	switch(mimehandler_get_type(handler))
 	{
 		case MIMEHANDLER_TYPE_APPLICATION:
-			return mimehandler_can_execute(handler);
+			return _can_open_application(handler);
 		case MIMEHANDLER_TYPE_DIRECTORY:
 			/* let errors be handled by the API user */
 			return 1;
@@ -208,6 +210,28 @@ int mimehandler_can_open(MimeHandler * handler)
 		case MIMEHANDLER_TYPE_UNKNOWN:
 			return 0;
 	}
+	return 0;
+}
+
+static int _can_open_application(MimeHandler * handler)
+{
+	String const * program;
+	String const * p;
+
+	if(mimehandler_can_execute(handler) == 0)
+		return 0;
+	if((program = mimehandler_get_program(handler)) == NULL)
+		/* XXX should not fail */
+		return 0;
+	for(p = string_find(program, "%"); p != NULL; p = string_find(p, "%"))
+		switch(*(++p))
+		{
+			case 'f':
+			case 'F':
+			case 'u':
+			case 'U':
+				return 1;
+		}
 	return 0;
 }
 
