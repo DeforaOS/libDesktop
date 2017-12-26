@@ -537,7 +537,7 @@ static int _open_application(MimeHandler * handler, String const * filename)
 	GError * error = NULL;
 
 	/* FIXME implement filename */
-	if((q = config_get(handler->config, SECTION, "Exec")) == NULL)
+	if((q = mimehandler_get_program(handler)) == NULL)
 		return -1;
 	if((program = string_new(q)) == NULL)
 		return -1;
