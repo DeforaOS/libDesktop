@@ -327,27 +327,17 @@ int mime_action(Mime * mime, char const * action, char const * path)
 int mime_action_type(Mime * mime, char const * action, char const * path,
 		char const * type)
 {
-	int ret = 0;
-	char const * program;
-	char * argv[3];
-	GError * error = NULL;
+	int ret;
+	MimeHandler * handler;
 
-	if((program = mime_get_handler(mime, type, action)) == NULL)
 #ifdef DEBUG
 	fprintf(stderr, "DEBUG: %s(\"%s\", \"%s\", \"%s\")\n", __func__, action,
 			path, type);
 #endif
+	if((handler = mime_get_handler(mime, type, action)) == NULL)
 		return -1;
-	argv[0] = strdup(program);
-	argv[1] = strdup(path);
-	argv[2] = NULL;
-	if(argv[0] == NULL || argv[1] == NULL)
-		ret = -error_set_code(2, "%s", strerror(errno));
-	else if(g_spawn_async(NULL, argv, NULL, G_SPAWN_SEARCH_PATH, NULL, NULL,
-				NULL, &error) == FALSE)
-		ret = -error_set_code(2, "%s: %s", argv[0], error->message);
-	free(argv[0]);
-	free(argv[1]);
+	ret = mimehandler_open(handler, path);
+	mimehandler_delete(handler);
 	return ret;
 }
 
