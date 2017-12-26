@@ -682,6 +682,28 @@ static int _open_application(MimeHandler * handler, String const * filename)
 				program = p;
 				p += len;
 				break;
+			case 'k':
+				if((name = handler->filename) == NULL)
+				{
+					/* ignore */
+					*(p++) = '"';
+					*(p++) = '"';
+					break;
+				}
+				*p = '\0';
+				q = p;
+				if((p = string_new_append(program, name, &q[2],
+								NULL)) == NULL)
+				{
+					string_delete(program);
+					return -1;
+				}
+				len = string_length(program)
+					- string_length(&q[2]);
+				string_delete(program);
+				program = p;
+				p += len;
+				break;
 			case '%':
 				/* ignore */
 				memmove(&p[1], &p[2], string_length(p[1]));
