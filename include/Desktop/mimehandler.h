@@ -64,7 +64,7 @@ String const * mimehandler_get_comment(MimeHandler * handler);
 String const * mimehandler_get_filename(MimeHandler * handler);
 String const * mimehandler_get_generic_name(MimeHandler * handler);
 String const * mimehandler_get_icon(MimeHandler * handler);
-String const * mimehandler_get_name(MimeHandler * handler);
+String const * mimehandler_get_name(MimeHandler * handler, int translated);
 String const * mimehandler_get_path(MimeHandler * handler);
 String const * mimehandler_get_program(MimeHandler * handler);
 MimeHandlerType mimehandler_get_type(MimeHandler * handler);
