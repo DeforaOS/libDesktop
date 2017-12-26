@@ -156,7 +156,7 @@ int mimehandler_can_execute(MimeHandler * handler)
 	if((p = config_get(handler->config, SECTION, "TryExec")) != NULL
 			&& _can_execute_access(p, X_OK) == 0)
 		return 0;
-	return (config_get(handler->config, SECTION, "Exec") != NULL) ? 1 : 0;
+	return (mimehandler_get_program(handler) != NULL) ? 1 : 0;
 }
 
 static int _can_execute_access(String const * path, int mode)
