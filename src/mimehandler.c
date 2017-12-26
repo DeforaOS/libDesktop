@@ -708,6 +708,10 @@ static int _open_application(MimeHandler * handler, String const * filename)
 				/* ignore */
 				memmove(&p[1], &p[2], string_length(p[1]));
 				break;
+			default:
+				/* XXX skip */
+				p++;
+				break;
 		}
 	}
 	if((q = mimehandler_get_path(handler)) == NULL)
