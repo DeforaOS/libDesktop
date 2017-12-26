@@ -237,7 +237,7 @@ MimeHandler * mime_get_handler(Mime * mime, char const * type,
 #endif
 	if(type == NULL || action == NULL)
 	{
-		error_set_code(1, "%s", strerror(EINVAL));
+		error_set_code(-EINVAL, "%s", strerror(EINVAL));
 		return NULL;
 	}
 	if((program = config_get(mime->config, type, action)) != NULL)
