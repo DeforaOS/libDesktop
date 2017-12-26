@@ -232,6 +232,9 @@ MimeHandler * mime_get_handler(Mime * mime, char const * type,
 	char * p;
 	char * q;
 
+#ifdef DEBUG
+	fprintf(stderr, "DEBUG: %s(\"%s\", \"%s\")\n", __func__, type, action);
+#endif
 	if(type == NULL || action == NULL)
 	{
 		error_set_code(1, "%s", strerror(EINVAL));
@@ -272,6 +275,9 @@ char const * mime_type(Mime * mime, char const * path)
 	size_t i;
 	size_t j;
 
+#ifdef DEBUG
+	fprintf(stderr, "DEBUG: %s(\"%s\")\n", __func__, path);
+#endif
 	p = strrchr(path, '/');
 	p = (p != NULL) ? p + 1 : path;
 	for(i = 0; i < mime->types_cnt; i++)
@@ -302,6 +308,9 @@ int mime_action(Mime * mime, char const * action, char const * path)
 {
 	char const * type;
 
+#ifdef DEBUG
+	fprintf(stderr, "DEBUG: %s(\"%s\", \"%s\")\n", __func__, action, path);
+#endif
 	if((type = mime_type(mime, path)) == NULL)
 		return 1;
 	return mime_action_type(mime, action, path, type);
@@ -318,6 +327,10 @@ int mime_action_type(Mime * mime, char const * action, char const * path,
 	GError * error = NULL;
 
 	if((program = mime_get_handler(mime, type, action)) == NULL)
+#ifdef DEBUG
+	fprintf(stderr, "DEBUG: %s(\"%s\", \"%s\", \"%s\")\n", __func__, action,
+			path, type);
+#endif
 		return -1;
 	argv[0] = strdup(program);
 	argv[1] = strdup(path);
