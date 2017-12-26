@@ -30,6 +30,9 @@
 
 #include <unistd.h>
 #include <stdlib.h>
+#ifdef DEBUG
+# include <stdio.h>
+#endif
 #include <string.h>
 #include <errno.h>
 #include <System.h>
@@ -488,6 +491,9 @@ int mimehandler_load_by_name(MimeHandler * handler, String const * name)
 	String const * q;
 	String * last;
 
+#ifdef DEBUG
+	fprintf(stderr, "DEBUG: %s(\"%s\")\n", __func__, name);
+#endif
 	/* use $XDG_DATA_HOME if set and not empty */
 	if((path = getenv("XDG_DATA_HOME")) != NULL && strlen(path) > 0
 			&& _load_by_name_path(handler, name, path) == 0)
@@ -511,6 +517,9 @@ int mimehandler_load_by_name(MimeHandler * handler, String const * name)
 		if((ret = _load_by_name_path(handler, name, q)) == 0)
 			break;
 	string_delete(p);
+#ifdef DEBUG
+	fprintf(stderr, "DEBUG: %s() => %d\n", __func__, ret);
+#endif
 	return ret;
 }
 
@@ -537,6 +546,9 @@ static int _open_url(MimeHandler * handler, String const * filename);
 
 int mimehandler_open(MimeHandler * handler, String const * filename)
 {
+#ifdef DEBUG
+	fprintf(stderr, "DEBUG: %s(\"%s\")\n", __func__, filename);
+#endif
 	switch(mimehandler_get_type(handler))
 	{
 		case MIMEHANDLER_TYPE_APPLICATION:
