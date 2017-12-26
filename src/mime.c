@@ -257,6 +257,8 @@ MimeHandler * mime_get_handler(Mime * mime, char const * type,
 	q[2] = '\0';
 	program = config_get(mime->config, p, action);
 	string_delete(p);
+	if(program == NULL)
+		return NULL;
 	return mimehandler_new_load_by_name(program);
 }
 
