@@ -570,20 +570,99 @@ static int _open_application(MimeHandler * handler, String const * filename)
 	String * program;
 	String * p;
 	String const * q;
+	String const * name;
 	pid_t pid;
 	GError * error = NULL;
 
-	/* FIXME implement filename */
 	if((q = mimehandler_get_program(handler)) == NULL)
 		return -1;
 	if((program = string_new(q)) == NULL)
 		return -1;
-	/* XXX crude way to ignore %f, %F, %u and %U */
-	if((p = strchr(program, '%')) != NULL)
-		*p = '\0';
-#ifdef DEBUG
-	fprintf(stderr, "DEBUG: %s() \"%s\"", __func__, program);
-#endif
+	for(p = string_find(program, "%"); p != NULL; p = string_find(p, "%"))
+	{
+		switch(p[1])
+		{
+			case 'c':
+				/* XXX should not fail */
+				if((name = mimehandler_get_name(handler, 1))
+						== NULL)
+				{
+					/* ignore */
+					memmove(p, &p[2], string_length(&p[1]));
+					break;
+				}
+				*p = '\0';
+				q = p;
+				if((p = string_new_append(program, name, &q[2],
+								NULL)) == NULL)
+				{
+					string_delete(program);
+					return -1;
+				}
+				len = string_length(program)
+					- string_length(&q[2]);
+				string_delete(program);
+				program = p;
+				p += len;
+				break;
+			case 'f':
+			case 'F':
+				if(filename == NULL)
+				{
+					/* ignore */
+					memmove(p, &p[2], string_length(&p[1]));
+					break;
+				}
+				*p = '\0';
+				q = p;
+				/* FIXME escape filename */
+				if((p = string_new_append(program, filename,
+								&q[2], NULL))
+						== NULL)
+				{
+					string_delete(program);
+					return -1;
+				}
+				len = string_length(program)
+					- string_length(&q[2]);
+				string_delete(program);
+				program = p;
+				p += len;
+				/* XXX avoid multiple inclusion */
+				filename = NULL;
+				break;
+			case 'u':
+			case 'U':
+				if(filename == NULL)
+				{
+					/* ignore */
+					memmove(p, &p[2], string_length(&p[1]));
+					break;
+				}
+				*p = '\0';
+				q = p;
+				/* FIXME escape filename */
+				if((p = string_new_append(program, "file:///",
+								filename, &q[2],
+								NULL)) == NULL)
+				{
+					string_delete(program);
+					return -1;
+				}
+				len = string_length(program)
+					- string_length(&q[2]);
+				string_delete(program);
+				program = p;
+				p += len;
+				/* XXX avoid multiple inclusion */
+				filename = NULL;
+				break;
+			case '%':
+				/* ignore */
+				memmove(&p[1], &p[2], string_length(p[1]));
+				break;
+		}
+	}
 	if((q = mimehandler_get_path(handler)) == NULL)
 	{
 		/* execute the program directly */
