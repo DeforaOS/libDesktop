@@ -571,6 +571,8 @@ static int _open_application(MimeHandler * handler, String const * filename)
 	String * p;
 	String const * q;
 	String const * name;
+	String const * icon;
+	size_t len;
 	pid_t pid;
 	GError * error = NULL;
 
@@ -656,6 +658,29 @@ static int _open_application(MimeHandler * handler, String const * filename)
 				p += len;
 				/* XXX avoid multiple inclusion */
 				filename = NULL;
+				break;
+			case 'i':
+				if((icon = mimehandler_get_icon(handler))
+						== NULL)
+				{
+					/* ignore */
+					memmove(p, &p[2], string_length(&p[1]));
+					break;
+				}
+				*p = '\0';
+				q = p;
+				if((p = string_new_append(program, "--icon ",
+								icon, &q[2],
+								NULL)) == NULL)
+				{
+					string_delete(program);
+					return -1;
+				}
+				len = string_length(program)
+					- string_length(&q[2]);
+				string_delete(program);
+				program = p;
+				p += len;
 				break;
 			case '%':
 				/* ignore */
