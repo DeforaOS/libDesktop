@@ -241,7 +241,13 @@ MimeHandler * mime_get_handler(Mime * mime, char const * type,
 		return NULL;
 	}
 	if((program = config_get(mime->config, type, action)) != NULL)
+	{
+#ifdef DEBUG
+		fprintf(stderr, "DEBUG: %s() => \"%s\"\n", __func__, program);
+#endif
 		return program;
+	}
+	/* generic fallback */
 	if((p = string_find(type, "/")) == NULL || *(++p) == '\0'
 			|| (p = string_new(type)) == NULL)
 		/* XXX the error may not be reported */
