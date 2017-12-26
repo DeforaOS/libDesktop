@@ -72,6 +72,16 @@ int main(void)
 		return 8;
 	}
 	free(types);
+	if(mimehandler_can_execute(handler) == 0)
+	{
+		mimehandler_delete(handler);
+		return 9;
+	}
+	if(mimehandler_can_open(handler) != 0)
+	{
+		mimehandler_delete(handler);
+		return 10;
+	}
 	mimehandler_delete(handler);
 	return 0;
 }
