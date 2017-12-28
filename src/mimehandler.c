@@ -815,7 +815,7 @@ static int _open_url(MimeHandler * handler, String const * filename)
 	String const * url;
 	/* XXX open with the default web browser instead */
 	char * argv[] = { BINDIR "/htmlapp", "--", NULL, NULL };
-	unsigned int flags = 0;
+	const unsigned int flags = 0;
 	GError * error = NULL;
 
 	if(filename != NULL)
