@@ -213,7 +213,7 @@ int mimehandler_can_open(MimeHandler * handler)
 		case MIMEHANDLER_TYPE_DIRECTORY:
 			/* let errors be handled by the API user */
 			return 1;
-		case MIMEHANDLER_TYPE_URL:
+		case MIMEHANDLER_TYPE_LINK:
 			return 1;
 		case MIMEHANDLER_TYPE_UNKNOWN:
 			return 0;
@@ -370,7 +370,7 @@ String const * mimehandler_get_program(MimeHandler * handler)
 			return config_get(handler->config, SECTION, "Exec");
 		case MIMEHANDLER_TYPE_DIRECTORY:
 		case MIMEHANDLER_TYPE_UNKNOWN:
-		case MIMEHANDLER_TYPE_URL:
+		case MIMEHANDLER_TYPE_LINK:
 			return NULL;
 	}
 	return NULL;
@@ -389,7 +389,7 @@ MimeHandlerType mimehandler_get_type(MimeHandler * handler)
 	{
 		{ "Application",MIMEHANDLER_TYPE_APPLICATION	},
 		{ "Directory",	MIMEHANDLER_TYPE_DIRECTORY	},
-		{ "URL",	MIMEHANDLER_TYPE_URL		}
+		{ "Link",	MIMEHANDLER_TYPE_LINK		}
 	};
 	size_t i;
 
@@ -457,7 +457,7 @@ String const ** mimehandler_get_types(MimeHandler * handler)
 /* mimehandler_get_url */
 String const * mimehandler_get_url(MimeHandler * handler)
 {
-	if(mimehandler_get_type(handler) == MIMEHANDLER_TYPE_URL)
+	if(mimehandler_get_type(handler) == MIMEHANDLER_TYPE_LINK)
 		return config_get(handler->config, SECTION, "URL");
 	return NULL;
 }
@@ -576,7 +576,7 @@ int mimehandler_open(MimeHandler * handler, String const * filename)
 			return _open_application(handler, filename);
 		case MIMEHANDLER_TYPE_DIRECTORY:
 			return _open_directory(handler, filename);
-		case MIMEHANDLER_TYPE_URL:
+		case MIMEHANDLER_TYPE_LINK:
 			return _open_url(handler, filename);
 		case MIMEHANDLER_TYPE_UNKNOWN:
 			/* XXX report error */
