@@ -318,7 +318,7 @@ String const * mimehandler_get_icon(MimeHandler * handler)
 
 
 /* mimehandler_get_name */
-String const * mimehandler_get_name(MimeHandler * handler, int translated)
+String const * mimehandler_get_name(MimeHandler * handler, int translate)
 {
 	/* FIXME implement translations */
 	return config_get(handler->config, SECTION, "Name");
