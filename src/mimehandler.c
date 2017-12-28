@@ -38,14 +38,22 @@
 #include <System.h>
 #include "Desktop.h"
 
+
+/* constants */
+#ifndef PROGNAME_BROWSER
+# define PROGNAME_BROWSER	"browser"
+#endif
+#ifndef PROGNAME_HTMLAPP
+# define PROGNAME_HTMLAPP	"htmlapp"
+#endif
 #ifndef PREFIX
-# define PREFIX		"/usr/local"
+# define PREFIX			"/usr/local"
 #endif
 #ifndef BINDIR
-# define BINDIR		PREFIX "/bin"
+# define BINDIR			PREFIX "/bin"
 #endif
 #ifndef DATADIR
-# define DATADIR	PREFIX "/share"
+# define DATADIR		PREFIX "/share"
 #endif
 
 
@@ -787,7 +795,7 @@ static int _open_directory(MimeHandler * handler, String const * filename)
 	int ret = 0;
 	String const * directory;
 	/* XXX open with the default file manager instead */
-	char * argv[] = { BINDIR "/browser", "--", NULL, NULL };
+	char * argv[] = { BINDIR "/" PROGNAME_BROWSER, "--", NULL, NULL };
 	const unsigned int flags = 0;
 	GError * error = NULL;
 
@@ -814,7 +822,7 @@ static int _open_url(MimeHandler * handler, String const * filename)
 	int ret = 0;
 	String const * url;
 	/* XXX open with the default web browser instead */
-	char * argv[] = { BINDIR "/htmlapp", "--", NULL, NULL };
+	char * argv[] = { BINDIR "/" PROGNAME_HTMLAPP, "--", NULL, NULL };
 	const unsigned int flags = 0;
 	GError * error = NULL;
 
