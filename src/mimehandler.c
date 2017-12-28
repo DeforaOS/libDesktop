@@ -290,8 +290,9 @@ String const ** mimehandler_get_categories(MimeHandler * handler)
 
 
 /* mimehandler_get_comment */
-String const * mimehandler_get_comment(MimeHandler * handler)
+String const * mimehandler_get_comment(MimeHandler * handler, int translate)
 {
+	/* FIXME implement translations */
 	return config_get(handler->config, SECTION, "Comment");
 }
 
@@ -304,15 +305,18 @@ String const * mimehandler_get_filename(MimeHandler * handler)
 
 
 /* mimehandler_get_generic_name */
-String const * mimehandler_get_generic_name(MimeHandler * handler)
+String const * mimehandler_get_generic_name(MimeHandler * handler,
+		int translate)
 {
+	/* FIXME implement translations */
 	return config_get(handler->config, SECTION, "GenericName");
 }
 
 
 /* mimehandler_get_icon */
-String const * mimehandler_get_icon(MimeHandler * handler)
+String const * mimehandler_get_icon(MimeHandler * handler, int translate)
 {
+	/* FIXME implement translations */
 	return config_get(handler->config, SECTION, "Icon");
 }
 
@@ -660,7 +664,7 @@ static int _open_application(MimeHandler * handler, String const * filename)
 				filename = NULL;
 				break;
 			case 'i':
-				if((icon = mimehandler_get_icon(handler))
+				if((icon = mimehandler_get_icon(handler, 1))
 						== NULL)
 				{
 					/* ignore */

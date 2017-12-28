@@ -60,10 +60,11 @@ int mimehandler_can_execute(MimeHandler * handler);
 int mimehandler_can_open(MimeHandler * handler);
 
 String const ** mimehandler_get_categories(MimeHandler * handler);
-String const * mimehandler_get_comment(MimeHandler * handler);
+String const * mimehandler_get_comment(MimeHandler * handler, int translate);
 String const * mimehandler_get_filename(MimeHandler * handler);
-String const * mimehandler_get_generic_name(MimeHandler * handler);
-String const * mimehandler_get_icon(MimeHandler * handler);
+String const * mimehandler_get_generic_name(MimeHandler * handler,
+		int translate);
+String const * mimehandler_get_icon(MimeHandler * handler, int translate);
 String const * mimehandler_get_name(MimeHandler * handler, int translate);
 String const * mimehandler_get_path(MimeHandler * handler);
 String const * mimehandler_get_program(MimeHandler * handler);
