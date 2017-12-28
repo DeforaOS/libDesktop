@@ -40,6 +40,7 @@ int main(void)
 	MimeHandler * handler;
 	char * path;
 	String const ** types;
+	String const * name;
 
 	if((path = getcwd(NULL, 0)) == NULL)
 		return 2;
@@ -61,26 +62,32 @@ int main(void)
 		mimehandler_delete(handler);
 		return 6;
 	}
+	if((name = mimehandler_get_name(handler, 0)) == NULL
+			|| string_compare(name, "Root folder") != 0)
+	{
+		mimehandler_delete(handler);
+		return 7;
+	}
 	mimehandler_delete(handler);
 	if((handler = mimehandler_new_load("applications/Widget.desktop"))
 			== NULL)
-		return 7;
+		return 8;
 	if((types = mimehandler_get_types(handler)) == NULL
 			|| types[0] != NULL)
 	{
 		mimehandler_delete(handler);
-		return 8;
+		return 9;
 	}
 	free(types);
 	if(mimehandler_can_execute(handler) == 0)
 	{
 		mimehandler_delete(handler);
-		return 9;
+		return 10;
 	}
 	if(mimehandler_can_open(handler) != 0)
 	{
 		mimehandler_delete(handler);
-		return 10;
+		return 11;
 	}
 	mimehandler_delete(handler);
 	return 0;
