@@ -710,7 +710,7 @@ static int _open_application(MimeHandler * handler, String const * filename)
 				break;
 			case '%':
 				/* ignore */
-				memmove(&p[1], &p[2], string_length(p[1]));
+				memmove(&p[1], &p[2], string_length(&p[1]));
 				break;
 			default:
 				/* XXX skip */
