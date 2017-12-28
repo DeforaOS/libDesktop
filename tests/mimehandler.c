@@ -68,26 +68,34 @@ int main(void)
 		mimehandler_delete(handler);
 		return 7;
 	}
+	if(setenv("LC_MESSAGES", "fr_FR@UTF-8", 1) != 0
+			|| (name = mimehandler_get_name(handler, 1)) == NULL
+			|| string_compare(name, "Répertoire racine") != 0
+			|| unsetenv("LC_MESSAGES") != 0)
+	{
+		mimehandler_delete(handler);
+		return 8;
+	}
 	mimehandler_delete(handler);
 	if((handler = mimehandler_new_load("applications/Widget.desktop"))
 			== NULL)
-		return 8;
+		return 9;
 	if((types = mimehandler_get_types(handler)) == NULL
 			|| types[0] != NULL)
 	{
 		mimehandler_delete(handler);
-		return 9;
+		return 10;
 	}
 	free(types);
 	if(mimehandler_can_execute(handler) == 0)
 	{
 		mimehandler_delete(handler);
-		return 10;
+		return 11;
 	}
 	if(mimehandler_can_open(handler) != 0)
 	{
 		mimehandler_delete(handler);
-		return 11;
+		return 12;
 	}
 	mimehandler_delete(handler);
 	return 0;
