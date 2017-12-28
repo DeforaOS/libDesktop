@@ -787,8 +787,8 @@ static int _open_directory(MimeHandler * handler, String const * filename)
 	int ret = 0;
 	String const * directory;
 	/* XXX open with the default file manager instead */
-	char * argv[] = { "browser", "--", NULL, NULL };
-	const unsigned int flags = G_SPAWN_SEARCH_PATH;
+	char * argv[] = { BINDIR "/browser", "--", NULL, NULL };
+	const unsigned int flags = 0;
 	GError * error = NULL;
 
 	if(filename != NULL)
