@@ -144,9 +144,15 @@ int mimehandler_can_display(MimeHandler * handler)
 {
 	String const * p;
 
-	if((p = config_get(handler->config, SECTION, "NoDisplay")) == NULL)
-		return 1;
-	return (string_compare(p, "true") == 0) ? 1 : 0;
+	if(mimehandler_is_deleted(handler))
+		return 0;
+	/* XXX allow setting a value for the desktop environment */
+	if(config_get(handler->config, SECTION, "OnlyShowIn") != NULL)
+		return 0;
+	if((p = config_get(handler->config, SECTION, "NoDisplay")) != NULL
+			&& string_compare(p, "true") == 0)
+		return 0;
+	return 1;
 }
 
 
@@ -463,14 +469,24 @@ String const * mimehandler_get_url(MimeHandler * handler)
 }
 
 
-/* mimehandler_is_hidden */
-int mimehandler_is_hidden(MimeHandler * handler)
+/* mimehandler_is_deleted */
+int mimehandler_is_deleted(MimeHandler * handler)
 {
 	String const * p;
 
-	if((p = config_get(handler->config, SECTION, "Hidden")) == NULL)
-		return 0;
-	return (string_compare(p, "true") == 0) ? 1 : 0;
+	if((p = config_get(handler->config, SECTION, "Hidden")) != NULL
+			&& string_compare(p, "true") == 0)
+		return 1;
+	switch(mimehandler_get_type(handler))
+	{
+		case MIMEHANDLER_TYPE_APPLICATION:
+			if(mimehandler_can_execute(handler) == 0)
+				return 1;
+			break;
+		default:
+			break;
+	}
+	return 0;
 }
 
 

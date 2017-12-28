@@ -72,7 +72,7 @@ MimeHandlerType mimehandler_get_type(MimeHandler * handler);
 String const ** mimehandler_get_types(MimeHandler * handler);
 String const * mimehandler_get_url(MimeHandler * handler);
 
-int mimehandler_is_hidden(MimeHandler * handler);
+int mimehandler_is_deleted(MimeHandler * handler);
 
 /* useful */
 int mimehandler_open(MimeHandler * handler, String const * filename);
