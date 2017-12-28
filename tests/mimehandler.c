@@ -39,7 +39,7 @@ int main(void)
 {
 	MimeHandler * handler;
 	char * path;
-	String ** types;
+	String const ** types;
 
 	if((path = getcwd(NULL, 0)) == NULL)
 		return 2;
