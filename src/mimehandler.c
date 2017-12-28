@@ -66,6 +66,11 @@ struct _MimeHandler
 
 
 /* prototypes */
+/* accessors */
+static String const * _mimehandler_get_translation(MimeHandler * handler,
+		String const * key);
+
+/* useful */
 static void _mimehandler_cache_invalidate(MimeHandler * handler);
 
 
@@ -292,8 +297,11 @@ String const ** mimehandler_get_categories(MimeHandler * handler)
 /* mimehandler_get_comment */
 String const * mimehandler_get_comment(MimeHandler * handler, int translate)
 {
-	/* FIXME implement translations */
-	return config_get(handler->config, SECTION, "Comment");
+	String const key[] = "Comment";
+
+	if(translate)
+		return _mimehandler_get_translation(handler, key);
+	return config_get(handler->config, SECTION, key);
 }
 
 
@@ -308,24 +316,33 @@ String const * mimehandler_get_filename(MimeHandler * handler)
 String const * mimehandler_get_generic_name(MimeHandler * handler,
 		int translate)
 {
-	/* FIXME implement translations */
-	return config_get(handler->config, SECTION, "GenericName");
+	String const key[] = "GenericName";
+
+	if(translate)
+		return _mimehandler_get_translation(handler, key);
+	return config_get(handler->config, SECTION, key);
 }
 
 
 /* mimehandler_get_icon */
 String const * mimehandler_get_icon(MimeHandler * handler, int translate)
 {
-	/* FIXME implement translations */
-	return config_get(handler->config, SECTION, "Icon");
+	String const key[] = "Icon";
+
+	if(translate)
+		return _mimehandler_get_translation(handler, key);
+	return config_get(handler->config, SECTION, key);
 }
 
 
 /* mimehandler_get_name */
 String const * mimehandler_get_name(MimeHandler * handler, int translate)
 {
-	/* FIXME implement translations */
-	return config_get(handler->config, SECTION, "Name");
+	String const key[] = "Name";
+
+	if(translate)
+		return _mimehandler_get_translation(handler, key);
+	return config_get(handler->config, SECTION, key);
 }
 
 
@@ -804,6 +821,86 @@ static int _open_url(MimeHandler * handler, String const * filename)
 
 
 /* private */
+/* accessors */
+/* mimehandler_get_translation */
+static String const * _translation_strip_country(MimeHandler * handler,
+		String * locale, String const * key);
+static String const * _translation_strip_encoding(MimeHandler * handler,
+		String * locale, String const * key);
+static String const * _translation_strip_modifier(MimeHandler * handler,
+		String * locale, String const * key);
+
+static String const * _mimehandler_get_translation(MimeHandler * handler,
+		String const * key)
+{
+	String const * ret;
+	String * locale;
+
+	if((ret = getenv("LC_MESSAGES")) != NULL
+			|| (ret = getenv("LANG")) != NULL)
+	{
+		if((locale = string_new(ret)) == NULL)
+			return NULL;
+		if((ret = _translation_strip_encoding(handler, locale, key))
+				== NULL
+				&& (ret = _translation_strip_modifier(handler,
+						locale, key)) == NULL)
+			ret = _translation_strip_country(handler, locale, key);
+		string_delete(locale);
+		if(ret != NULL)
+			return ret;
+	}
+	return config_get(handler->config, SECTION, key);
+}
+
+static String const * _translation_strip_country(MimeHandler * handler,
+		String * locale, String const * key)
+{
+	String const * ret;
+	String * p;
+
+	if((p = string_find(locale, "_")) == NULL)
+		return NULL;
+	*p = '\0';
+	if((p = string_new_append(key, "[", locale, "]", NULL)) == NULL)
+		return NULL;
+	ret = config_get(handler->config, SECTION, p);
+	string_delete(p);
+	return ret;
+}
+
+static String const * _translation_strip_encoding(MimeHandler * handler,
+		String * locale, String const * key)
+{
+	String const * ret;
+	String * p;
+
+	/* FIXME really strip the encoding */
+	if((p = string_new_append(key, "[", locale, "]", NULL)) == NULL)
+		return NULL;
+	ret = config_get(handler->config, SECTION, p);
+	string_delete(p);
+	return ret;
+}
+
+static String const * _translation_strip_modifier(MimeHandler * handler,
+		String * locale, String const * key)
+{
+	String const * ret;
+	String * p;
+
+	if((p = string_find(locale, "@")) == NULL)
+		return NULL;
+	*p = '\0';
+	if((p = string_new_append(key, "[", locale, "]", NULL)) == NULL)
+		return NULL;
+	ret = config_get(handler->config, SECTION, p);
+	string_delete(p);
+	return ret;
+}
+
+
+/* useful */
 /* mimehandler_cache_invalidate */
 static void _mimehandler_cache_invalidate(MimeHandler * handler)
 {
