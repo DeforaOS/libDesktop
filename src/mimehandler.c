@@ -28,6 +28,7 @@
 
 
 
+#include <sys/param.h>
 #include <unistd.h>
 #include <stdlib.h>
 #ifdef DEBUG
@@ -618,6 +619,7 @@ static int _open_application(MimeHandler * handler, String const * filename)
 	String const * name;
 	String const * icon;
 	size_t len;
+	char buf[MAXPATHLEN];
 	pid_t pid;
 	GError * error = NULL;
 
@@ -663,9 +665,11 @@ static int _open_application(MimeHandler * handler, String const * filename)
 				*p = '\0';
 				q = p;
 				/* FIXME escape filename */
-				if((p = string_new_append(program, filename,
-								&q[2], NULL))
-						== NULL)
+				if((p = string_new_append(program,
+								(filename[0] != '/') ? getwd(buf) : "",
+								(filename[0] != '/') ? "/" : "",
+								filename, &q[2],
+								NULL)) == NULL)
 				{
 					string_delete(program);
 					return -1;
@@ -689,7 +693,9 @@ static int _open_application(MimeHandler * handler, String const * filename)
 				*p = '\0';
 				q = p;
 				/* FIXME escape filename */
-				if((p = string_new_append(program, "file:///",
+				if((p = string_new_append(program, "file://",
+								(filename[0] != '/') ? getwd(buf) : "",
+								(filename[0] != '/') ? "/" : "",
 								filename, &q[2],
 								NULL)) == NULL)
 				{
