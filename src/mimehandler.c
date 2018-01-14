@@ -587,6 +587,8 @@ static int _load_by_name_path(MimeHandler * handler, String const * name,
 
 /* mimehandler_open */
 static int _open_application(MimeHandler * handler, String const * filename);
+static int _open_application_getcwd(String const * filename, char * buf,
+		size_t size);
 static int _open_directory(MimeHandler * handler, String const * filename);
 static int _open_url(MimeHandler * handler, String const * filename);
 
@@ -664,9 +666,14 @@ static int _open_application(MimeHandler * handler, String const * filename)
 				}
 				*p = '\0';
 				q = p;
+				if(_open_application_getcwd(filename, buf,
+							sizeof(buf)) != 0)
+				{
+					string_delete(program);
+					return -1;
+				}
 				/* FIXME escape filename */
-				if((p = string_new_append(program,
-								(filename[0] != '/') ? getwd(buf) : "",
+				if((p = string_new_append(program, buf,
 								(filename[0] != '/') ? "/" : "",
 								filename, &q[2],
 								NULL)) == NULL)
@@ -692,9 +699,14 @@ static int _open_application(MimeHandler * handler, String const * filename)
 				}
 				*p = '\0';
 				q = p;
+				if(_open_application_getcwd(filename, buf,
+							sizeof(buf)) != 0)
+				{
+					string_delete(program);
+					return -1;
+				}
 				/* FIXME escape filename */
-				if((p = string_new_append(program, "file://",
-								(filename[0] != '/') ? getwd(buf) : "",
+				if((p = string_new_append(program, "file://", buf,
 								(filename[0] != '/') ? "/" : "",
 								filename, &q[2],
 								NULL)) == NULL)
@@ -794,6 +806,21 @@ static int _open_application(MimeHandler * handler, String const * filename)
 	}
 	string_delete(program);
 	return ret;
+}
+
+static int _open_application_getcwd(String const * filename, char * buf,
+		size_t size)
+{
+	if(size == 0)
+		return -error_set_code(-ENOMEM, "%s", strerror(ENOMEM));
+	if(filename[0] == '/')
+	{
+		buf[0] = '\0';
+		return 0;
+	}
+	if(getcwd(buf, size) == NULL)
+		return -error_set_code(errno, "%s", strerror(errno));
+	return 0;
 }
 
 static int _open_directory(MimeHandler * handler, String const * filename)
