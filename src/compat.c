@@ -93,6 +93,36 @@ GtkWidget * gtk_paned_new(GtkOrientation orientation)
 }
 
 
+/* gtk_scale_new */
+GtkWidget * gtk_scale_new(GtkOrientation orientation,
+		GtkAdjustment * adjustment)
+{
+	switch(orientation)
+	{
+		case GTK_ORIENTATION_HORIZONTAL:
+			return gtk_hscale_new(adjustment);
+		case GTK_ORIENTATION_VERTICAL:
+		default:
+			return gtk_vscale_new(adjustment);
+	}
+}
+
+
+/* gtk_scale_new_with_range */
+GtkWidget * gtk_scale_new_with_range(GtkOrientation orientation,
+		gdouble min, gdouble max, gdouble step)
+{
+	switch(orientation)
+	{
+		case GTK_ORIENTATION_HORIZONTAL:
+			return gtk_hscale_new_with_range(min, max, step);
+		case GTK_ORIENTATION_VERTICAL:
+		default:
+			return gtk_vscale_new_with_range(min, max, step);
+	}
+}
+
+
 /* gtk_separator_new */
 GtkWidget * gtk_separator_new(GtkOrientation orientation)
 {
