@@ -590,6 +590,7 @@ static int _open_application(MimeHandler * handler, String const * filename);
 static int _open_application_getcwd(String const * filename, char * buf,
 		size_t size);
 static int _open_directory(MimeHandler * handler, String const * filename);
+static String * _open_escape(String const * filename);
 static int _open_url(MimeHandler * handler, String const * filename);
 
 int mimehandler_open(MimeHandler * handler, String const * filename)
@@ -615,6 +616,7 @@ int mimehandler_open(MimeHandler * handler, String const * filename)
 static int _open_application(MimeHandler * handler, String const * filename)
 {
 	int ret = 0;
+	String * f;
 	String * program;
 	String * p;
 	String const * q;
@@ -672,15 +674,19 @@ static int _open_application(MimeHandler * handler, String const * filename)
 					string_delete(program);
 					return -1;
 				}
-				/* FIXME escape filename */
-				if((p = string_new_append(program, buf,
-								(filename[0] != '/') ? "/" : "",
-								filename, &q[2],
+				if((f = _open_escape(filename)) == NULL
+						|| (p = string_new_append(
+								program, buf,
+								(f[0] != '/')
+								? "/" : "",
+								f, &q[2],
 								NULL)) == NULL)
 				{
+					string_delete(f);
 					string_delete(program);
 					return -1;
 				}
+				string_delete(f);
 				len = string_length(program)
 					- string_length(&q[2]);
 				string_delete(program);
@@ -705,15 +711,20 @@ static int _open_application(MimeHandler * handler, String const * filename)
 					string_delete(program);
 					return -1;
 				}
-				/* FIXME escape filename */
-				if((p = string_new_append(program, "file://", buf,
-								(filename[0] != '/') ? "/" : "",
-								filename, &q[2],
+				if((f = _open_escape(filename)) == NULL
+						|| (p = string_new_append(
+								program,
+								"file://", buf,
+								(f[0] != '/')
+								? "/" : "",
+								f, &q[2],
 								NULL)) == NULL)
 				{
+					string_delete(f);
 					string_delete(program);
 					return -1;
 				}
+				string_delete(f);
 				len = string_length(program)
 					- string_length(&q[2]);
 				string_delete(program);
@@ -847,6 +858,44 @@ static int _open_directory(MimeHandler * handler, String const * filename)
 		g_error_free(error);
 	}
 	string_delete(argv[2]);
+	return ret;
+}
+
+static String * _open_escape(String const * filename)
+{
+	String * ret;
+	struct
+	{
+		String const * from;
+		String const * to;
+	} escapes[] =
+	{
+		{ "\\",		"\\\\"	},
+		{ "&",		"\\&"	},
+		{ "|",		"\\|"	},
+		{ ";",		"\\;"	},
+		{ "<",		"\\<"	},
+		{ ">",		"\\>"	},
+		{ "{",		"\\{"	},
+		{ "}",		"\\}"	},
+		{ "!",		"\\!"	},
+		{ "$",		"\\$"	},
+		{ "'",		"\\'"	},
+		{ "\"",		"\\\""	},
+		{ " ",		"\\ "	},
+		{ "\t",		"\\\t"	},
+		{ "\n",		"\\\n"	}
+	};
+	size_t i;
+
+	if((ret = string_new(filename)) == NULL)
+		return NULL;
+	for(i = 0; i < sizeof(escapes) / sizeof(*escapes); i++)
+		if(string_replace(&ret, escapes[i].from, escapes[i].to) != 0)
+		{
+			string_delete(ret);
+			return NULL;
+		}
 	return ret;
 }
 
