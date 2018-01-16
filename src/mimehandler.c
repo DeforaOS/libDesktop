@@ -838,7 +838,7 @@ static int _open_directory(MimeHandler * handler, String const * filename)
 {
 	int ret = 0;
 	String const * directory;
-	/* XXX open with the default file manager instead */
+	/* FIXME open with inode/directory handlers instead */
 	char * argv[] = { BINDIR "/" PROGNAME_BROWSER, "--", NULL, NULL };
 	const unsigned int flags = 0;
 	GError * error = NULL;
