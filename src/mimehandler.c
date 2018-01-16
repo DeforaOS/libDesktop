@@ -278,7 +278,7 @@ String const ** mimehandler_get_categories(MimeHandler * handler)
 			return NULL;
 		ret[0] = NULL;
 		handler->categories = ret;
-		return ret;
+		return (String const **)ret;
 	}
 	if((q = string_new(p)) == NULL)
 		return NULL;
@@ -305,7 +305,7 @@ String const ** mimehandler_get_categories(MimeHandler * handler)
 	if(ret != NULL)
 		ret[cnt] = NULL;
 	handler->categories = ret;
-	return ret;
+	return (String const **)ret;
 }
 
 
@@ -429,7 +429,7 @@ String const ** mimehandler_get_types(MimeHandler * handler)
 	String ** r;
 
 	if(handler->types != NULL)
-		return handler->types;
+		return (String const **)handler->types;
 	if(mimehandler_get_type(handler) != MIMEHANDLER_TYPE_APPLICATION)
 		return NULL;
 	if((p = config_get(handler->config, SECTION, "MimeType")) == NULL)
@@ -438,7 +438,7 @@ String const ** mimehandler_get_types(MimeHandler * handler)
 			return NULL;
 		ret[0] = NULL;
 		handler->types = ret;
-		return ret;
+		return (String const **)ret;
 	}
 	if((q = string_new(p)) == NULL)
 		return NULL;
@@ -465,7 +465,7 @@ String const ** mimehandler_get_types(MimeHandler * handler)
 	if(ret != NULL)
 		ret[cnt] = NULL;
 	handler->types = ret;
-	return ret;
+	return (String const **)ret;
 }
 
 
