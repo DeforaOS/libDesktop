@@ -958,7 +958,7 @@ static String const * _mimehandler_get_translation(MimeHandler * handler,
 						locale, key)) == NULL)
 			ret = _translation_strip_country(handler, locale, key);
 		string_delete(locale);
-		if(ret != NULL)
+		if(ret != NULL && string_get_length(ret) > 0)
 			return ret;
 	}
 	return config_get(handler->config, SECTION, key);
