@@ -642,7 +642,8 @@ static int _open_application(MimeHandler * handler, String const * filename)
 						== NULL)
 				{
 					/* ignore */
-					memmove(p, &p[2], string_length(&p[1]));
+					memmove(p, &p[2], string_get_length(
+								&p[1]));
 					break;
 				}
 				*p = '\0';
@@ -653,8 +654,8 @@ static int _open_application(MimeHandler * handler, String const * filename)
 					string_delete(program);
 					return -1;
 				}
-				len = string_length(program)
-					- string_length(&q[2]);
+				len = string_get_length(program)
+					- string_get_length(&q[2]);
 				string_delete(program);
 				program = p;
 				p += len;
@@ -664,7 +665,8 @@ static int _open_application(MimeHandler * handler, String const * filename)
 				if(filename == NULL)
 				{
 					/* ignore */
-					memmove(p, &p[2], string_length(&p[1]));
+					memmove(p, &p[2], string_get_length(
+								&p[1]));
 					break;
 				}
 				*p = '\0';
@@ -688,8 +690,8 @@ static int _open_application(MimeHandler * handler, String const * filename)
 					return -1;
 				}
 				string_delete(f);
-				len = string_length(program)
-					- string_length(&q[2]);
+				len = string_get_length(program)
+					- string_get_length(&q[2]);
 				string_delete(program);
 				program = p;
 				p += len;
@@ -701,7 +703,8 @@ static int _open_application(MimeHandler * handler, String const * filename)
 				if(filename == NULL)
 				{
 					/* ignore */
-					memmove(p, &p[2], string_length(&p[1]));
+					memmove(p, &p[2], string_get_length(
+								&p[1]));
 					break;
 				}
 				*p = '\0';
@@ -726,8 +729,8 @@ static int _open_application(MimeHandler * handler, String const * filename)
 					return -1;
 				}
 				string_delete(f);
-				len = string_length(program)
-					- string_length(&q[2]);
+				len = string_get_length(program)
+					- string_get_length(&q[2]);
 				string_delete(program);
 				program = p;
 				p += len;
@@ -739,7 +742,8 @@ static int _open_application(MimeHandler * handler, String const * filename)
 						== NULL)
 				{
 					/* ignore */
-					memmove(p, &p[2], string_length(&p[1]));
+					memmove(p, &p[2], string_get_length(
+								&p[1]));
 					break;
 				}
 				*p = '\0';
@@ -751,8 +755,8 @@ static int _open_application(MimeHandler * handler, String const * filename)
 					string_delete(program);
 					return -1;
 				}
-				len = string_length(program)
-					- string_length(&q[2]);
+				len = string_get_length(program)
+					- string_get_length(&q[2]);
 				string_delete(program);
 				program = p;
 				p += len;
@@ -773,15 +777,15 @@ static int _open_application(MimeHandler * handler, String const * filename)
 					string_delete(program);
 					return -1;
 				}
-				len = string_length(program)
-					- string_length(&q[2]);
+				len = string_get_length(program)
+					- string_get_length(&q[2]);
 				string_delete(program);
 				program = p;
 				p += len;
 				break;
 			case '%':
 				/* ignore */
-				memmove(&p[1], &p[2], string_length(&p[1]));
+				memmove(&p[1], &p[2], string_get_length(&p[1]));
 				break;
 			default:
 				/* XXX skip */
