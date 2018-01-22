@@ -177,7 +177,7 @@ int mimehandler_can_execute(MimeHandler * handler)
 	if(mimehandler_get_type(handler) != MIMEHANDLER_TYPE_APPLICATION)
 		return 0;
 	if((p = config_get(handler->config, SECTION, "TryExec")) != NULL
-			&& _can_execute_access(p, X_OK) == 0)
+			&& _can_execute_access(p, X_OK) <= 0)
 		return 0;
 	return (mimehandler_get_program(handler) != NULL) ? 1 : 0;
 }
@@ -190,14 +190,15 @@ static int _can_execute_access(String const * path, int mode)
 	String * last;
 
 	if(path[0] == '/')
-		return access(path, mode);
+		return (access(path, mode) == 0) ? 1 : 0;
 	if((p = getenv("PATH")) == NULL)
 		return 0;
 	if((q = string_new(p)) == NULL)
-		return 0;
+		return -1;
 	for(p = strtok_r(q, ":", &last); p != NULL;
 			p = strtok_r(NULL, ":", &last))
-		ret = _can_execute_access_path(p, path, mode);
+		if((ret = _can_execute_access_path(p, path, mode)) > 0)
+			break;
 	string_delete(q);
 	return ret;
 }
@@ -210,7 +211,7 @@ static int _can_execute_access_path(String const * path,
 
 	if((p = string_new_append(path, "/", filename, NULL)) == NULL)
 		return -1;
-	ret = access(p, mode);
+	ret = (access(p, mode) == 0) ? 1 : 0;
 	string_delete(p);
 	return ret;
 }
