@@ -332,11 +332,17 @@ String const * mimehandler_get_filename(MimeHandler * handler)
 String const * mimehandler_get_generic_name(MimeHandler * handler,
 		int translate)
 {
+	String const * ret;
 	String const key[] = "GenericName";
 
 	if(translate)
-		return _mimehandler_get_translation(handler, key);
-	return config_get(handler->config, SECTION, key);
+		if((ret = _mimehandler_get_translation(handler, key)) != NULL
+				&& string_get_length(ret) != 0)
+			return ret;
+	if((ret = config_get(handler->config, SECTION, key)) != NULL
+			&& string_get_length(ret) == 0)
+		ret = NULL;
+	return ret;
 }
 
 
