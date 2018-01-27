@@ -66,6 +66,7 @@ struct _MimeHandler
 	String * filename;
 	String ** categories;
 	String ** types;
+	String * environment;
 };
 
 
@@ -96,6 +97,7 @@ MimeHandler * mimehandler_new(void)
 	handler->filename = NULL;
 	handler->categories = NULL;
 	handler->types = NULL;
+	handler->environment = NULL;
 	if(handler->config == NULL)
 	{
 		mimehandler_delete(handler);
@@ -143,6 +145,7 @@ void mimehandler_delete(MimeHandler * handler)
 	_mimehandler_cache_invalidate(handler);
 	config_delete(handler->config);
 	string_delete(handler->filename);
+	string_delete(handler->environment);
 	object_delete(handler);
 }
 
@@ -155,8 +158,9 @@ int mimehandler_can_display(MimeHandler * handler)
 
 	if(mimehandler_is_deleted(handler))
 		return 0;
-	/* XXX allow setting a value for the desktop environment */
-	if(config_get(handler->config, SECTION, "OnlyShowIn") != NULL)
+	if((p = config_get(handler->config, SECTION, "OnlyShowIn")) != NULL
+			&& (handler->environment == NULL
+				|| string_compare(p, handler->environment)))
 		return 0;
 	if((p = config_get(handler->config, SECTION, "NoDisplay")) != NULL
 			&& string_compare(p, "true") == 0)
@@ -318,6 +322,13 @@ String const * mimehandler_get_comment(MimeHandler * handler, int translate)
 	if(translate)
 		return _mimehandler_get_translation(handler, key);
 	return config_get(handler->config, SECTION, key);
+}
+
+
+/* mimehandler_get_environment */
+String const * mimehandler_get_environment(MimeHandler * handler)
+{
+	return handler->environment;
 }
 
 
@@ -502,6 +513,20 @@ int mimehandler_is_deleted(MimeHandler * handler)
 		default:
 			break;
 	}
+	return 0;
+}
+
+
+/* mimehandler_set_environment */
+int mimehandler_set_environment(MimeHandler * handler,
+		String const * environment)
+{
+	String * p;
+
+	if((p = string_new(environment)) == NULL)
+		return -1;
+	string_delete(handler->environment);
+	handler->environment = p;
 	return 0;
 }
 
