@@ -125,6 +125,14 @@ GtkWidget * gtk_scale_new_with_range(GtkOrientation orientation,
 
 GtkWidget * gtk_separator_new(GtkOrientation orientation);
 
+#  if !GTK_CHECK_VERSION(2, 18, 0)
+GtkAllocation gtk_widget_get_allocation(GtkWidget * widget);
+#  endif
+
+#  if !GTK_CHECK_VERSION(2, 12, 0)
+void gtk_widget_set_tooltip_text(GtkWidget * widget, const gchar * text);
+#  endif
+
 void gtk_widget_override_font(GtkWidget * widget,
 		const PangoFontDescription * desc);
 # endif

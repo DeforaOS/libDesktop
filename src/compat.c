@@ -137,6 +137,25 @@ GtkWidget * gtk_separator_new(GtkOrientation orientation)
 }
 
 
+# if !GTK_CHECK_VERSION(2, 18, 0)
+/* gtk_widget_get_allocation */
+GtkAllocation gtk_widget_get_allocation(GtkWidget * widget)
+{
+	return widget->allocation;
+}
+# endif
+
+
+# if !GTK_CHECK_VERSION(2, 12, 0)
+/* gtk_widget_set_tooltip_text */
+void gtk_widget_set_tooltip_text(GtkWidget * widget, const gchar * text)
+{
+	(void) widget;
+	(void) text;
+}
+# endif
+
+
 /* gtk_widget_override_font */
 void gtk_widget_override_font(GtkWidget * widget,
 		const PangoFontDescription * desc)
