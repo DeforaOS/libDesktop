@@ -156,6 +156,54 @@ void gtk_widget_set_tooltip_text(GtkWidget * widget, const gchar * text)
 # endif
 
 
+/* gtk_widget_override_color */
+void gtk_widget_override_color(GtkWidget * widget, GtkStateFlags state,
+		const GdkRGBA * color)
+{
+	GtkStateType s;
+	GdkColor c;
+	GdkColor * p;
+
+	switch(state)
+	{
+		case GTK_STATE_FLAG_NORMAL:
+			s = GTK_STATE_NORMAL;
+			break;
+		case GTK_STATE_FLAG_ACTIVE:
+			s = GTK_STATE_ACTIVE;
+			break;
+		case GTK_STATE_FLAG_PRELIGHT:
+			s = GTK_STATE_PRELIGHT;
+			break;
+		case GTK_STATE_FLAG_SELECTED:
+			s = GTK_STATE_SELECTED;
+			break;
+		case GTK_STATE_FLAG_INSENSITIVE:
+			s = GTK_STATE_INSENSITIVE;
+			break;
+		case GTK_STATE_FLAG_INCONSISTENT:
+			s = GTK_STATE_INCONSISTENT;
+			break;
+		case GTK_STATE_FLAG_FOCUSED:
+			s = GTK_STATE_FOCUSED;
+			break;
+		default:
+			/* XXX ignore */
+			return;
+	}
+	if(color != NULL)
+	{
+		c.red = (double)color->red / 65535.0;
+		c.green = (double)color->green / 65535.0;
+		c.blue = (double)color->blue / 65535.0;
+		p = &c;
+	}
+	else
+		p = NULL;
+	gtk_widget_modify_fg(widget, s, p);
+}
+
+
 /* gtk_widget_override_font */
 void gtk_widget_override_font(GtkWidget * widget,
 		const PangoFontDescription * desc)

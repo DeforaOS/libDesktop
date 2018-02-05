@@ -119,7 +119,6 @@ GtkWidget * gtk_paned_new(GtkOrientation orientation);
 
 GtkWidget * gtk_scale_new(GtkOrientation orientation,
 		GtkAdjustment * adjustment);
-
 GtkWidget * gtk_scale_new_with_range(GtkOrientation orientation,
 		gdouble min, gdouble max, gdouble step);
 
@@ -133,6 +132,8 @@ GtkAllocation gtk_widget_get_allocation(GtkWidget * widget);
 void gtk_widget_set_tooltip_text(GtkWidget * widget, const gchar * text);
 #  endif
 
+void gtk_widget_override_color(GtkWidget * widget, GtkStateFlags state,
+		const GdkRGBA * color);
 void gtk_widget_override_font(GtkWidget * widget,
 		const PangoFontDescription * desc);
 # endif
