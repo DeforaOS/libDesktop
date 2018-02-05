@@ -79,6 +79,15 @@ GtkWidget * gtk_button_box_new(GtkOrientation orientation)
 }
 
 
+# if !GTK_CHECK_VERSION(2, 14, 0)
+/* gtk_dialog_get_content_area */
+GtkWidget * gtk_dialog_get_content_area(GtkDialog * dialog)
+{
+	return dialog->vbox;
+}
+# endif
+
+
 /* gtk_paned_new */
 GtkWidget * gtk_paned_new(GtkOrientation orientation)
 {

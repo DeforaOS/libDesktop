@@ -135,6 +135,10 @@ GtkWidget * gtk_box_new(GtkOrientation orientation, gint spacing);
 
 GtkWidget * gtk_button_box_new(GtkOrientation orientation);
 
+#  if !GTK_CHECK_VERSION(2, 14, 0)
+GtkWidget * gtk_dialog_get_content_area(GtkDialog * dialog);
+#  endif
+
 GtkWidget * gtk_paned_new(GtkOrientation orientation);
 
 GtkWidget * gtk_scale_new(GtkOrientation orientation,
