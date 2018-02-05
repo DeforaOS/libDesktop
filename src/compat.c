@@ -146,6 +146,17 @@ GtkAllocation gtk_widget_get_allocation(GtkWidget * widget)
 # endif
 
 
+# if !GTK_CHECK_VERSION(2, 14, 0)
+/* gtk_widget_get_window */
+GdkWindow * gtk_widget_get_window(GtkWidget * widget)
+{
+	if(!gtk_widget_is_realized(widget))
+		return NULL;
+	return widget->window;
+}
+# endif
+
+
 # if !GTK_CHECK_VERSION(2, 12, 0)
 /* gtk_widget_set_tooltip_text */
 void gtk_widget_set_tooltip_text(GtkWidget * widget, const gchar * text)

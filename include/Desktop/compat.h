@@ -148,6 +148,10 @@ GtkWidget * gtk_separator_new(GtkOrientation orientation);
 GtkAllocation gtk_widget_get_allocation(GtkWidget * widget);
 #  endif
 
+#  if !GTK_CHECK_VERSION(2, 14, 0)
+GdkWindow * gtk_widget_get_window(GtkWidget * widget);
+#  endif
+
 #  if !GTK_CHECK_VERSION(2, 12, 0)
 void gtk_widget_set_tooltip_text(GtkWidget * widget, const gchar * text);
 #  endif
