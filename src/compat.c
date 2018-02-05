@@ -181,12 +181,6 @@ void gtk_widget_override_color(GtkWidget * widget, GtkStateFlags state,
 		case GTK_STATE_FLAG_INSENSITIVE:
 			s = GTK_STATE_INSENSITIVE;
 			break;
-		case GTK_STATE_FLAG_INCONSISTENT:
-			s = GTK_STATE_INCONSISTENT;
-			break;
-		case GTK_STATE_FLAG_FOCUSED:
-			s = GTK_STATE_FOCUSED;
-			break;
 		default:
 			/* XXX ignore */
 			return;

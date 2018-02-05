@@ -109,6 +109,26 @@
 
 /* Gtk+ 3.0 */
 # if !GTK_CHECK_VERSION(3, 0, 0)
+/* types */
+typedef struct _GdkRGBA
+{
+	gdouble red;
+	gdouble green;
+	gdouble blue;
+	gdouble alpha;
+} GdkRGBA;
+
+typedef enum _GtkStateFlags
+{
+	GTK_STATE_FLAG_NORMAL		= 0x00,
+	GTK_STATE_FLAG_ACTIVE		= 0x01,
+	GTK_STATE_FLAG_PRELIGHT		= 0x02,
+	GTK_STATE_FLAG_SELECTED		= 0x04,
+	GTK_STATE_FLAG_INSENSITIVE	= 0x08
+} GtkStateFlags;
+
+
+/* functions */
 void gdk_window_clear(GdkWindow * window);
 
 GtkWidget * gtk_box_new(GtkOrientation orientation, gint spacing);
