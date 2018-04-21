@@ -882,29 +882,8 @@ static int _open_application_getcwd(String const * filename, char * buf,
 
 static int _open_directory(MimeHandler * handler, String const * filename)
 {
-	int ret = 0;
-	String const * directory;
-	/* FIXME open with inode/directory handlers instead */
-	char * argv[] = { BINDIR "/" PROGNAME_BROWSER, "--", NULL, NULL };
-	const unsigned int flags = 0;
-	GError * error = NULL;
-
-	if(filename != NULL)
-		return error_set_code(-EINVAL, "%s", strerror(EINVAL));
-	/* XXX this may not be the correct key */
-	if((directory = mimehandler_get_path(handler)) == NULL)
-		/* XXX report an error? */
-		return 0;
-	if((argv[2] = string_new(directory)) == NULL)
-		return -1;
-	else if(g_spawn_async(NULL, argv, NULL, flags, NULL, NULL, NULL, &error)
-			!= TRUE)
-	{
-		ret = -error_set_code(1, "%s: %s", directory, error->message);
-		g_error_free(error);
-	}
-	string_delete(argv[2]);
-	return ret;
+	/* behave like an application */
+	return _open_application(handler, filename);
 }
 
 static String * _open_escape(String const * filename)
