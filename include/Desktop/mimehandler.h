@@ -31,7 +31,6 @@
 #ifndef LIBDESKTOP_DESKTOP_MIMEHANDLER_H
 # define LIBDESKTOP_DESKTOP_MIMEHANDLER_H
 
-# include <System/config.h>
 # include <System/string.h>
 
 
