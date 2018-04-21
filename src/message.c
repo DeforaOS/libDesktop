@@ -142,7 +142,7 @@ int desktop_message_send(char const * destination, uint32_t value1,
 	gdk_error_trap_push();
 	XSendEvent(gdk_x11_get_default_xdisplay(),
 			gdk_x11_get_default_root_xwindow(), False,
-			StructureNotifyMask | /* FIXME check the mask */
+			StructureNotifyMask | /* XXX check the mask */
 			SubstructureNotifyMask | SubstructureRedirectMask,
 			&xev);
 	return (gdk_error_trap_pop() == 0) ? 0 : -1;
