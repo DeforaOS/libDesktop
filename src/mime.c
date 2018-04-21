@@ -38,6 +38,7 @@
 #include <libintl.h>
 #include <System.h>
 #include "Desktop.h"
+#include "mimehandler.h"
 #include "../config.h"
 
 /* constants */
@@ -241,10 +242,26 @@ MimeHandler * mime_get_handler(Mime * mime, char const * type,
 		error_set_code(-EINVAL, "%s", strerror(EINVAL));
 		return NULL;
 	}
-	if((program = config_get(mime->config, type, action)) != NULL
-			&& (handler = mimehandler_new_load_by_name(program))
-			!= NULL)
-		return handler;
+	if((program = config_get(mime->config, type, action)) != NULL)
+	{
+		if(program[0] == '/' && (handler = mimehandler_new()) != NULL)
+		{
+			/* open with a specific executable */
+			if(mimehandler_set(handler, "Type", "Application") != 0
+					|| mimehandler_set(handler, "Name",
+						program) != 0
+					|| mimehandler_set(handler, "Exec",
+						program) != 0)
+			{
+				mimehandler_delete(handler);
+				return NULL;
+			}
+			else
+				return handler;
+		}
+		if((handler = mimehandler_new_load_by_name(program)) != NULL)
+			return handler;
+	}
 	/* generic fallback */
 	if((p = string_find(type, "/")) == NULL || *(++p) == '\0'
 			|| (p = string_new(type)) == NULL)

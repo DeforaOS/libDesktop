@@ -38,6 +38,7 @@
 #include <errno.h>
 #include <System.h>
 #include "Desktop.h"
+#include "mimehandler.h"
 
 
 /* constants */
@@ -82,6 +83,15 @@ static String const * _mimehandler_get_translation(MimeHandler * handler,
 
 /* useful */
 static void _mimehandler_cache_invalidate(MimeHandler * handler);
+
+
+/* protected */
+/* functions */
+int mimehandler_set(MimeHandler * handler, String const * variable,
+		String const * value)
+{
+	return config_set(handler->config, SECTION, variable, value);
+}
 
 
 /* public */
