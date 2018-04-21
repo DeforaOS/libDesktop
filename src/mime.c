@@ -226,6 +226,9 @@ void mime_delete(Mime * mime)
 
 /* accessors */
 /* mime_get_handler */
+static MimeHandler * _get_handler_executable(char const * type,
+		char const * program);
+
 MimeHandler * mime_get_handler(Mime * mime, char const * type,
 		char const * action)
 {
@@ -244,21 +247,9 @@ MimeHandler * mime_get_handler(Mime * mime, char const * type,
 	}
 	if((program = config_get(mime->config, type, action)) != NULL)
 	{
-		if(program[0] == '/' && (handler = mimehandler_new()) != NULL)
-		{
+		if(program[0] == '/')
 			/* open with a specific executable */
-			if(mimehandler_set(handler, "Type", "Application") != 0
-					|| mimehandler_set(handler, "Name",
-						program) != 0
-					|| mimehandler_set(handler, "Exec",
-						program) != 0)
-			{
-				mimehandler_delete(handler);
-				return NULL;
-			}
-			else
-				return handler;
-		}
+			return _get_handler_executable(type, program);
 		if((handler = mimehandler_new_load_by_name(program)) != NULL)
 			return handler;
 	}
@@ -274,7 +265,28 @@ MimeHandler * mime_get_handler(Mime * mime, char const * type,
 	string_delete(p);
 	if(program == NULL)
 		return NULL;
+	if(program[0] == '/')
+		/* open with a specific executable */
+		return _get_handler_executable(type, program);
 	return mimehandler_new_load_by_name(program);
+}
+
+static MimeHandler * _get_handler_executable(char const * type,
+		char const * program)
+{
+	MimeHandler * handler;
+
+	if((handler = mimehandler_new()) == NULL)
+		return NULL;
+	if(mimehandler_set(handler, "Type", "Application") != 0
+			|| mimehandler_set(handler, "Name", program) != 0
+			|| mimehandler_set(handler, "MimeType", type) != 0
+			|| mimehandler_set(handler, "Exec", program) != 0)
+	{
+		mimehandler_delete(handler);
+		return NULL;
+	}
+	return handler;
 }
 
 
