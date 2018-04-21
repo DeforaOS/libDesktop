@@ -1,5 +1,5 @@
 /* $Id$ */
-/* Copyright (c) 2011-2017 Pierre Pronchery <khorben@defora.org> */
+/* Copyright (c) 2011-2018 Pierre Pronchery <khorben@defora.org> */
 /* This file is part of DeforaOS libDesktop */
 /* All rights reserved.
  *
@@ -275,17 +275,21 @@ static MimeHandler * _get_handler_executable(char const * type,
 		char const * program)
 {
 	MimeHandler * handler;
+	String * p;
 
 	if((handler = mimehandler_new()) == NULL)
 		return NULL;
-	if(mimehandler_set(handler, "Type", "Application") != 0
+	if((p = string_new_append(program, " %f", NULL)) == NULL
+			|| mimehandler_set(handler, "Type", "Application") != 0
 			|| mimehandler_set(handler, "Name", program) != 0
 			|| mimehandler_set(handler, "MimeType", type) != 0
-			|| mimehandler_set(handler, "Exec", program) != 0)
+			|| mimehandler_set(handler, "Exec", p) != 0)
 	{
+		string_delete(p);
 		mimehandler_delete(handler);
 		return NULL;
 	}
+	string_delete(p);
 	return handler;
 }
 
