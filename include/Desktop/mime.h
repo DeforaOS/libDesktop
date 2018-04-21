@@ -56,7 +56,6 @@ void mime_set_theme(Mime * mime, GtkIconTheme * theme);
 
 /* useful */
 char const * mime_type(Mime * mime, char const * path);
-/* FIXME return an enum with error codes? */
 int mime_action(Mime * mime, char const * action, char const * path);
 int mime_action_type(Mime * mime, char const * action, char const * path,
 		char const * type);
