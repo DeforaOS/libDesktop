@@ -1006,7 +1006,7 @@ static String const * _translation_strip_encoding(MimeHandler * handler,
 	String const * ret;
 	String * p;
 
-	/* FIXME really strip the encoding */
+	/* TODO really strip the encoding */
 	if((p = string_new_append(key, "[", locale, "]", NULL)) == NULL)
 		return NULL;
 	ret = config_get(handler->config, SECTION, p);
