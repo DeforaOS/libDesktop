@@ -86,7 +86,6 @@ int main(void)
 		mimehandler_delete(handler);
 		return 10;
 	}
-	free(types);
 	if(mimehandler_can_execute(handler) == 0)
 	{
 		mimehandler_delete(handler);
