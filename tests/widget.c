@@ -52,13 +52,12 @@ static int _widget(char const * name)
 {
 	int ret;
 	DesktopWidget * widget;
-	GtkWidget * test;
 
 	if((widget = desktop_widget_new(name)) == NULL)
 		ret = -_error(name, 1);
 	else
 	{
-		test = desktop_widget_get_widget(widget);
+		desktop_widget_get_widget(widget);
 		ret = desktop_widget_set_property(widget, NULL);
 		desktop_widget_delete(widget);
 	}
