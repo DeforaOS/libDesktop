@@ -20,17 +20,17 @@ To install libDesktop in a dedicated directory, like `/path/to/libDesktop`:
     $ make PREFIX="/path/to/libDesktop" install
 
 
-Using Gtk+ version 3
+Using Gtk+ version 2
 --------------------
 
-libDesktop defaults to the version 2 of the Gtk+ toolkit. Alternatively, it is
-possible to re-generate the Makefiles for the Gtk+ 3 toolkit with `configure(1)`
+libDesktop defaults to the version 3 of the Gtk+ toolkit. Alternatively, it is
+possible to re-generate the Makefiles for the Gtk+ 2 toolkit with `configure(1)`
 from the DeforaOS configure project, found at
 <https://www.defora.org/os/project/16/configure>. The procedure is then as
 follows:
 
     $ $EDITOR data/libDesktop.pc.in
-    [replace "gtk+-2.0" with "gtk+-3.0"]
+    [replace "gtk+-3.0" with "gtk+-2.0"]
     $ $EDITOR src/project.conf tests/project.conf tools/project.conf
     [comment lines in and out as described]
     $ make distclean
