@@ -60,7 +60,7 @@ static int _usage(char const * error);
 
 /* functions */
 /* widget */
-static gboolean _widget_on_closex(gpointer data);
+static gboolean _widget_on_closex(void);
 
 static int _widget(WidgetPrefs * prefs, int namec, char ** namev)
 {
@@ -105,7 +105,7 @@ static int _widget(WidgetPrefs * prefs, int namec, char ** namev)
 	return ret;
 }
 
-static gboolean _widget_on_closex(gpointer data)
+static gboolean _widget_on_closex(void)
 {
 	gtk_main_quit();
 	return TRUE;
