@@ -3,6 +3,7 @@ Makefile
 /config.sh
 *~
 *.a
+*.bak
 *.dll
 *.dylib
 *.o
