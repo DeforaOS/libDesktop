@@ -126,22 +126,24 @@ int desktop_message_send(char const * destination, uint32_t value1,
 		uint32_t value2, uint32_t value3)
 {
 #if GTK_CHECK_VERSION(3, 0, 0)
+	GdkDisplay * display;
+	Display * xdisplay;
 	XEvent xev;
 	XClientMessageEvent * xcme = &xev.xclient;
 
+	display = gdk_display_get_default();
+	xdisplay = gdk_x11_display_get_xdisplay(display);
 	memset(&xev, 0, sizeof(xev));
 	xev.type = ClientMessage;
 	xcme->serial = 0;
 	xcme->send_event = True;
-	xcme->message_type = XInternAtom(gdk_x11_get_default_xdisplay(),
-			destination, FALSE);
+	xcme->message_type = XInternAtom(xdisplay, destination, FALSE);
 	xcme->format = 32;
 	xcme->data.l[0] = value1;
 	xcme->data.l[1] = value2;
 	xcme->data.l[2] = value3;
 	gdk_error_trap_push();
-	XSendEvent(gdk_x11_get_default_xdisplay(),
-			gdk_x11_get_default_root_xwindow(), False,
+	XSendEvent(xdisplay, gdk_x11_get_default_root_xwindow(), False,
 			StructureNotifyMask | /* XXX check the mask */
 			SubstructureNotifyMask | SubstructureRedirectMask,
 			&xev);
