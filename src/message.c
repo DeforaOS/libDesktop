@@ -142,12 +142,12 @@ int desktop_message_send(char const * destination, uint32_t value1,
 	xcme->data.l[0] = value1;
 	xcme->data.l[1] = value2;
 	xcme->data.l[2] = value3;
-	gdk_error_trap_push();
+	gdk_x11_display_error_trap_push(display);
 	XSendEvent(xdisplay, gdk_x11_get_default_root_xwindow(), False,
 			StructureNotifyMask | /* XXX check the mask */
 			SubstructureNotifyMask | SubstructureRedirectMask,
 			&xev);
-	return (gdk_error_trap_pop() == 0) ? 0 : -1;
+	return (gdk_x11_display_error_trap_pop(display) == 0) ? 0 : -1;
 #else
 	GdkAtom atom;
 	GdkEvent event;
