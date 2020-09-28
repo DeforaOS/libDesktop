@@ -89,20 +89,21 @@ static void _new_config(Mime * mime);
 Mime * mime_new(GtkIconTheme * theme)
 {
 	Mime * mime;
-	char * globs[] =
+	char * globs2[] =
 	{
-		DATADIR "/mime/globs",
-	       	"/usr/share/mime/globs",
-	       	"/usr/local/share/mime/globs",
-	       	"/usr/pkg/share/mime/globs",
+		DATADIR "/mime/globs2",
+		"/usr/share/mime/globs2",
+		"/usr/local/share/mime/globs2",
+		"/usr/pkg/share/mime/globs2",
 		NULL
 	};
-	char ** g = globs;
+	char ** g = globs2;
 	FILE * fp = NULL;
 	char buf[256];
 	size_t len;
+	char * p;
 	char * glob;
-	MimeType * p;
+	MimeType * type;
 	size_t i;
 	char ** q;
 
@@ -111,7 +112,7 @@ Mime * mime_new(GtkIconTheme * theme)
 	if(theme == NULL)
 		theme = gtk_icon_theme_get_default();
 	mime->theme = theme;
-	for(g = globs; *g != NULL; g++)
+	for(g = globs2; *g != NULL; g++)
 		if((fp = fopen(*g, "r")) != NULL)
 			break;
 	if(fp == NULL)
@@ -132,47 +133,55 @@ Mime * mime_new(GtkIconTheme * theme)
 		if(buf[0] == '#')
 			continue;
 		buf[len] = '\0';
-		glob = strchr(buf, ':');
+		/* parse the priority */
+		errno = 0;
+		strtoul(buf, &p, 0);
+		if(errno != 0 || *(p++) != ':')
+			continue;
+		glob = strchr(p, ':');
 		*(glob++) = '\0';
 		for(i = 0; i < mime->types_cnt; i++)
-			if(strcmp(mime->types[i].type, buf) == 0)
+			if(strcmp(mime->types[i].type, p) == 0)
 				break;
 		if(i < mime->types_cnt)
-			p = &mime->types[i];
-		else if((p = realloc(mime->types, sizeof(*p) * (mime->types_cnt
-							+ 1))) == NULL)
-				break;
+			type = &mime->types[i];
+		else if((type = realloc(mime->types, sizeof(*type)
+						* (mime->types_cnt + 1)))
+				== NULL)
+			break;
 		else
 		{
-			mime->types = p;
-			p = &p[mime->types_cnt];
-			p->type = strdup(buf);
-			p->globs = NULL;
-			p->globs_cnt = 0;
+			mime->types = type;
+			type = &type[mime->types_cnt];
+			type->type = strdup(p);
+			type->globs = NULL;
+			type->globs_cnt = 0;
 		}
-		if((q = realloc(p->globs, sizeof(*p->globs)
-						* (p->globs_cnt + 1))) != NULL)
+		if((q = realloc(type->globs, sizeof(*type->globs)
+						* (type->globs_cnt + 1)))
+				!= NULL)
 		{
-			p->globs = q;
-			p->globs[p->globs_cnt] = strdup(glob);
+			type->globs = q;
+			type->globs[type->globs_cnt] = strdup(glob);
 		}
-		if(p->type == NULL || p->globs == NULL
-				|| p->globs[p->globs_cnt] == NULL)
+		if(type->type == NULL
+				|| type->globs == NULL
+				|| type->globs[type->globs_cnt] == NULL)
 		{
-			free(p->type);
-			free(p->globs);
+			free(type->type);
+			free(type->globs);
 			break;
 		}
-		if(p->globs_cnt++ == 0)
+		if(type->globs_cnt++ == 0)
 			mime->types_cnt++;
-		p->icon_24 = NULL;
-		p->icon_48 = NULL;
-		p->icon_96 = NULL;
+		type->icon_24 = NULL;
+		type->icon_48 = NULL;
+		type->icon_96 = NULL;
 #if 0
-		p->open = mime->config != NULL
-			? config_get(mime->config, buf, "open") : NULL;
-		p->edit = mime->config != NULL
-			? config_get(mime->config, buf, "edit") : NULL;
+		type->open = mime->config != NULL
+			? config_get(mime->config, p, "open") : NULL;
+		type->edit = mime->config != NULL
+			? config_get(mime->config, p, "edit") : NULL;
 #endif
 	}
 	if(!feof(fp))
