@@ -38,7 +38,7 @@ _pkgconfig()
 	packages="$3"
 
 	echo -n "$caption"
-	output=$($PKGCONFIG $options "$packages")
+	output=$(PKG_CONFIG_PATH="$PKG_CONFIG_PATH" $PKGCONFIG $options "$packages")
 	ret=$?
 	echo "$output"
 	return $ret
