@@ -29,12 +29,9 @@ from the DeforaOS configure project, found at
 <https://www.defora.org/os/project/16/configure>. The procedure is then as
 follows:
 
-    $ $EDITOR data/libDesktop.pc.in
-    [replace "gtk+-3.0" with "gtk+-2.0"]
-    $ $EDITOR src/project.conf tests/project.conf tools/project.conf
-    [comment lines in and out as described]
+    $ configure -M gtk2-debug
+    [or "gtk2-release"]
     $ make distclean
-    $ configure
     $ make
 
 Please refer to the documentation of DeforaOS configure for further
