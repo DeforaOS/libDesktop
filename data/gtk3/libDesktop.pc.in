@@ -6,6 +6,6 @@ libdir=${exec_prefix}/lib
 Name: @PACKAGE@
 Description: DeforaOS Desktop helper library
 Version: @VERSION@
-Requires: libSystem gtk+-3.0
+Requires: libSystem gtk+-3.0 x11
 Cflags: -I${includedir}
 Libs: @RPATH@ -L${libdir} -lDesktop
