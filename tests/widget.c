@@ -88,7 +88,11 @@ int main(int argc, char * argv[])
 	int ret = 0;
 	int o;
 
+#if GTK_CHECK_VERSION(4, 0, 0)
+	gtk_init();
+#else
 	gtk_init(&argc, &argv);
+#endif
 	while((o = getopt(argc, argv, "")) != -1)
 		switch(o)
 		{

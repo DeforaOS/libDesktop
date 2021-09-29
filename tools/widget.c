@@ -60,7 +60,7 @@ static int _usage(char const * error);
 
 /* functions */
 /* widget */
-static gboolean _widget_on_closex(void);
+static gboolean _widget_on_closex(GtkWidget * widget);
 
 static int _widget(WidgetPrefs * prefs, int namec, char ** namev)
 {
@@ -101,12 +101,12 @@ static int _widget(WidgetPrefs * prefs, int namec, char ** namev)
 	gtk_container_add(GTK_CONTAINER(window), box);
 	gtk_widget_show_all(window);
 	gtk_main();
-	gtk_widget_destroy(window);
 	return ret;
 }
 
-static gboolean _widget_on_closex(void)
+static gboolean _widget_on_closex(GtkWidget * widget)
 {
+	gtk_widget_destroy(widget);
 	gtk_main_quit();
 	return TRUE;
 }
@@ -141,7 +141,11 @@ int main(int argc, char * argv[])
 	char * p;
 
 	memset(&prefs, 0, sizeof(prefs));
+#if GTK_CHECK_VERSION(4, 0, 0)
 	gtk_init(&argc, &argv);
+#else
+	gtk_init(&argc, &argv);
+#endif
 	while((o = getopt(argc, argv, "h:t:w:")) != -1)
 		switch(o)
 		{
