@@ -107,8 +107,29 @@
 #  define GDK_KEY_uparrow	GDK_uparrow
 # endif
 
+/* Gtk+ 4.0 */
+# if GTK_CHECK_VERSION(4, 0, 0)
+void gtk_box_pack_end(GtkBox * box, GtkWidget * child,
+		gboolean fill, gboolean expand, gint padding);
+void gtk_box_pack_start(GtkBox * box, GtkWidget * child,
+		gboolean fill, gboolean expand, gint padding);
+
+# define GTK_CONTAINER(a) GTK_WIDGET(a)
+void gtk_container_add(GtkWidget * container, GtkWidget * child);
+
+# define GTK_ICON_LOOKUP_USE_BUILTIN		0
+# define GTK_ICON_LOOKUP_GENERIC_FALLBACK	0
+GdkPixbuf * gtk_icon_theme_load_icon(GtkIconTheme * theme, char const * name,
+		GtkIconSize size, guint flags, gpointer data);
+
+void gtk_main(void);
+
+# define GTK_STOCK_DIRECTORY			"gtk-directory"
+# define GTK_STOCK_FILE				"gtk-file"
+# define GTK_STOCK_MISSING_IMAGE		"gtk-missing-image"
+
+# elif !GTK_CHECK_VERSION(3, 0, 0)
 /* Gtk+ 3.0 */
-# if !GTK_CHECK_VERSION(3, 0, 0)
 /* types */
 typedef struct _GdkRGBA
 {

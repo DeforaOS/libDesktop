@@ -110,7 +110,12 @@ Mime * mime_new(GtkIconTheme * theme)
 	if((mime = object_new(sizeof(*mime))) == NULL)
 		return NULL;
 	if(theme == NULL)
+#if GTK_CHECK_VERSION(4, 0, 0)
+		theme = gtk_icon_theme_get_for_display(
+				gdk_display_get_default());
+#else
 		theme = gtk_icon_theme_get_default();
+#endif
 	mime->theme = theme;
 	for(g = globs2; *g != NULL; g++)
 		if((fp = fopen(*g, "r")) != NULL)

@@ -31,6 +31,8 @@
 #ifndef LIBDESKTOP_DESKTOP_TOOLBAR_H
 # define LIBDESKTOP_DESKTOP_TOOLBAR_H
 
+# include "accel.h"
+
 
 /* Toolbar */
 /* types */
@@ -41,7 +43,11 @@ typedef struct _DesktopToolbar
 	const char * stock;
 	GdkModifierType modifier;
 	unsigned int accel;
+# if GTK_CHECK_VERSION(4, 0, 0)
+	GtkWidget * widget;
+# else
 	GtkToolItem * widget;
+# endif
 } DesktopToolbar;
 
 

@@ -142,7 +142,7 @@ int main(int argc, char * argv[])
 
 	memset(&prefs, 0, sizeof(prefs));
 #if GTK_CHECK_VERSION(4, 0, 0)
-	gtk_init(&argc, &argv);
+	gtk_init();
 #else
 	gtk_init(&argc, &argv);
 #endif

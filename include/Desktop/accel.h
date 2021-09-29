@@ -41,6 +41,10 @@ typedef struct _DesktopAccel
 	unsigned int accel;
 } DesktopAccel;
 
+# if GTK_CHECK_VERSION(4, 0, 0)
+typedef void GtkAccelGroup;
+# endif
+
 
 /* functions */
 void desktop_accel_create(DesktopAccel const * accel, gpointer data,

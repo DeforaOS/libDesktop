@@ -28,13 +28,41 @@
 
 
 
-#include <gdk/gdkx.h>
+#include <gtk/gtk.h>
+#if GTK_CHECK_VERSION(4, 0, 0)
+# include <gdk/x11/gdkx.h>
+#else
+# include <gdk/gdkx.h>
+#endif
 #include "Desktop.h"
 
 
 /* Compat */
+#if GTK_CHECK_VERSION(4, 0, 0)
+/* Gtk+ 4 */
+/* gtk_icon_theme_load_icon */
+GdkPixbuf * gtk_icon_theme_load_icon(GtkIconTheme * theme, char const * name,
+		GtkIconSize size, guint flags, gpointer data)
+{
+	GtkWidget * image;
+	(void) theme;
+
+	image = gtk_image_new_from_icon_name(name);
+	gtk_image_set_icon_size(GTK_IMAGE(image), size);
+	return image;
+}
+
+
+/* gtk_main */
+void gtk_main(void)
+{
+	while(g_list_model_get_n_items(gtk_window_get_toplevels()) > 0)
+		g_main_context_iteration(NULL, TRUE);
+}
+
+
+#elif GTK_CHECK_VERSION(3, 0, 0)
 /* Gtk+ 3 */
-#if GTK_CHECK_VERSION(3, 0, 0)
 /* gdk_window_clear */
 void gdk_window_clear(GdkWindow * window)
 {
@@ -47,10 +75,10 @@ void gdk_window_clear(GdkWindow * window)
 	XClearWindow(display, wid);
 	gdk_error_trap_pop();
 }
-#endif
 
 
-#if !GTK_CHECK_VERSION(3, 0, 0)
+#elif GTK_CHECK_VERSION(2, 0, 0)
+/* Gtk+ 2.0 */
 /* gtk_box_new */
 GtkWidget * gtk_box_new(GtkOrientation orientation, gint spacing)
 {

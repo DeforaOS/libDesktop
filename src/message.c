@@ -37,7 +37,9 @@
 #include <string.h>
 #include <errno.h>
 #include <gtk/gtk.h>
-#if GTK_CHECK_VERSION(3, 0, 0)
+#if GTK_CHECK_VERSION(4, 0, 0)
+# include <gdk/x11/gdkx.h>
+#elif GTK_CHECK_VERSION(3, 0, 0)
 # include <gtk/gtkx.h>
 #else
 # include <gdk/gdkx.h>
