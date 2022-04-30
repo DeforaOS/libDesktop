@@ -97,7 +97,16 @@ Mime * mime_new(GtkIconTheme * theme)
 		"/usr/pkg/share/mime/globs2",
 		NULL
 	};
-	char ** g = globs2;
+	char * globs[] =
+	{
+		DATADIR "/mime/globs",
+		"/usr/share/mime/globs",
+		"/usr/local/share/mime/globs",
+		"/usr/pkg/share/mime/globs",
+		NULL
+	};
+	int priority = 1;
+	char ** g;
 	FILE * fp = NULL;
 	char buf[256];
 	size_t len;
@@ -116,6 +125,10 @@ Mime * mime_new(GtkIconTheme * theme)
 		if((fp = fopen(*g, "r")) != NULL)
 			break;
 	if(fp == NULL)
+		for(g = globs, priority = 0; *g != NULL; g++)
+			if((fp = fopen(*g, "r")) != NULL)
+				break;
+	if(fp == NULL)
 	{
 		error_set_code(1, "%s", "Could not load MIME globs");
 		object_delete(mime);
@@ -133,11 +146,16 @@ Mime * mime_new(GtkIconTheme * theme)
 		if(buf[0] == '#')
 			continue;
 		buf[len] = '\0';
-		/* parse the priority */
-		errno = 0;
-		strtoul(buf, &p, 0);
-		if(errno != 0 || *(p++) != ':')
-			continue;
+		if(priority)
+		{
+			/* parse the priority */
+			errno = 0;
+			strtoul(buf, &p, 0);
+			if(errno != 0 || *(p++) != ':')
+				continue;
+		}
+		else
+			p = buf;
 		glob = strchr(p, ':');
 		*(glob++) = '\0';
 		for(i = 0; i < mime->types_cnt; i++)
