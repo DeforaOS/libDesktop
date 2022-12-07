@@ -28,7 +28,10 @@
 
 
 
-#include <gdk/gdkx.h>
+#include <gdk/gdk.h>
+#if defined(GDK_WINDOWING_X11)
+# include <gdk/gdkx.h>
+#endif
 #include "Desktop.h"
 
 
@@ -38,6 +41,7 @@
 /* gdk_window_clear */
 void gdk_window_clear(GdkWindow * window)
 {
+# if defined(GDK_WINDOWING_X11)
 	Display * display;
 	Window wid;
 
@@ -46,6 +50,7 @@ void gdk_window_clear(GdkWindow * window)
 	gdk_error_trap_push();
 	XClearWindow(display, wid);
 	gdk_error_trap_pop();
+# endif
 }
 #endif
 

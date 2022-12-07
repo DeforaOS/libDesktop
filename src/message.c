@@ -37,10 +37,12 @@
 #include <string.h>
 #include <errno.h>
 #include <gtk/gtk.h>
-#if GTK_CHECK_VERSION(3, 0, 0)
-# include <gtk/gtkx.h>
-#else
-# include <gdk/gdkx.h>
+#if defined(GDK_WINDOWING_X11)
+# if GTK_CHECK_VERSION(3, 0, 0)
+#  include <gtk/gtkx.h>
+# else
+#  include <gdk/gdkx.h>
+# endif
 #endif
 #include <System.h>
 #include "Desktop.h"
@@ -52,11 +54,13 @@
 typedef struct _MessageCallback
 {
 	GtkWidget * window;
-#if GTK_CHECK_VERSION(3, 0, 0)
+#if defined(GDK_WINDOWING_X11)
+# if GTK_CHECK_VERSION(3, 0, 0)
 	Atom atom;
-#else
+# else
 	GtkWidget * widget;
 	Window xwindow;
+# endif
 #endif
 	DesktopMessageCallback callback;
 	void * data;
@@ -70,8 +74,10 @@ static size_t _callbacks_cnt = 0;
 
 /* prototypes */
 /* callbacks */
+#if defined(GDK_WINDOWING_X11)
 static GdkFilterReturn _desktop_message_on_callback(GdkXEvent * xevent,
 		GdkEvent * event, gpointer data);
+#endif
 
 
 /* public */
@@ -83,8 +89,10 @@ int desktop_message_register(GtkWidget * window, char const * destination,
 	MessageCallback ** p;
 	MessageCallback * mc;
 	GdkWindow * gwindow;
-#if !GTK_CHECK_VERSION(3, 0, 0)
+#if defined(GDK_WINDOWING_X11)
+# if !GTK_CHECK_VERSION(3, 0, 0)
 	GdkAtom atom;
+# endif
 #endif
 
 #ifdef DEBUG
@@ -99,12 +107,13 @@ int desktop_message_register(GtkWidget * window, char const * destination,
 	_callbacks[_callbacks_cnt++] = mc;
 	mc->callback = callback;
 	mc->data = data;
-#if GTK_CHECK_VERSION(3, 0, 0)
+#if defined(GDK_WINDOWING_X11)
+# if GTK_CHECK_VERSION(3, 0, 0)
 	mc->atom = XInternAtom(gdk_x11_get_default_xdisplay(), destination,
 			FALSE);
 	gwindow = (window != NULL) ? gtk_widget_get_window(window) : NULL;
 	gdk_window_add_filter(gwindow, _desktop_message_on_callback, mc);
-#else
+# else
 	if((mc->window = window) == NULL)
 	{
 		mc->widget = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -116,6 +125,7 @@ int desktop_message_register(GtkWidget * window, char const * destination,
 	mc->xwindow = GDK_WINDOW_XWINDOW(gwindow);
 	atom = gdk_atom_intern(destination, FALSE);
 	gdk_add_client_message_filter(atom, _desktop_message_on_callback, mc);
+# endif
 #endif
 	return 0;
 }
@@ -125,7 +135,8 @@ int desktop_message_register(GtkWidget * window, char const * destination,
 int desktop_message_send(char const * destination, uint32_t value1,
 		uint32_t value2, uint32_t value3)
 {
-#if GTK_CHECK_VERSION(3, 0, 0)
+#if defined(GDK_WINDOWING_X11)
+# if GTK_CHECK_VERSION(3, 0, 0)
 	GdkDisplay * display;
 	Display * xdisplay;
 	XEvent xev;
@@ -148,7 +159,7 @@ int desktop_message_send(char const * destination, uint32_t value1,
 			SubstructureNotifyMask | SubstructureRedirectMask,
 			&xev);
 	return (gdk_x11_display_error_trap_pop(display) == 0) ? 0 : -1;
-#else
+# else
 	GdkAtom atom;
 	GdkEvent event;
 	GdkEventClient * client = &event.client;
@@ -165,6 +176,10 @@ int desktop_message_send(char const * destination, uint32_t value1,
 	client->data.l[2] = value3;
 	gdk_event_send_clientmessage_toall(&event);
 	return 0;
+# endif
+#else
+	/* FIXME not implemented */
+	return -1;
 #endif
 }
 
@@ -196,22 +211,25 @@ void desktop_message_unregister(GtkWidget * window,
 #else
 	w = gtk_widget_get_window(mc->widget);
 #endif
+#if defined(GDK_WINDOWING_X11)
 	gdk_window_remove_filter(w, _desktop_message_on_callback, mc);
-#if !GTK_CHECK_VERSION(3, 0, 0)
+# if !GTK_CHECK_VERSION(3, 0, 0)
 	if(mc->window == NULL)
 		gtk_widget_destroy(mc->widget);
-#endif
+# endif
 	object_delete(mc);
 	p = &_callbacks[i];
 	memmove(p, p + 1, sizeof(*p) * (_callbacks_cnt - i - 1));
 	if((p = realloc(_callbacks, sizeof(*p) * (--_callbacks_cnt))) != NULL
 			|| _callbacks_cnt == 0)
 		_callbacks = p;
+#endif
 }
 
 
 /* private */
 /* callbacks */
+#if defined(GDK_WINDOWING_X11)
 /* desktop_message_on_callback */
 static GdkFilterReturn _desktop_message_on_callback(GdkXEvent * xevent,
 		GdkEvent * event, gpointer data)
@@ -254,3 +272,4 @@ static GdkFilterReturn _desktop_message_on_callback(GdkXEvent * xevent,
 	desktop_message_unregister(mc->window, mc->callback, mc->data);
 	return GDK_FILTER_REMOVE;
 }
+#endif
