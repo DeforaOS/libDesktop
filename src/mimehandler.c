@@ -597,7 +597,13 @@ int mimehandler_load_by_name(MimeHandler * handler, String const * name)
 		return ret;
 	/* read through every XDG application folder */
 	if((path = getenv("XDG_DATA_DIRS")) == NULL || strlen(path) == 0)
-		path = "/usr/local/share:" DATADIR ":/usr/share";
+	{
+		/* XXX avoid duplicates if PREFIX is "/usr/local" */
+		if(string_compare("/usr/local/share", DATADIR) != 0)
+			path = "/usr/local/share:" DATADIR ":/usr/share";
+		else
+			path = "/usr/local/share:/usr/share";
+	}
 	if((p = string_new(path)) == NULL)
 		return -1;
 	for(q = strtok_r(p, ":", &last); q != NULL;
