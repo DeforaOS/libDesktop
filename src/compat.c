@@ -50,6 +50,8 @@ void gdk_window_clear(GdkWindow * window)
 	gdk_error_trap_push();
 	XClearWindow(display, wid);
 	gdk_error_trap_pop();
+# else
+	(void) window;
 # endif
 }
 #endif
