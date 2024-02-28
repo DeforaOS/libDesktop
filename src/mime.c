@@ -128,15 +128,12 @@ Mime * mime_new(GtkIconTheme * theme)
 		for(g = globs, priority = 0; *g != NULL; g++)
 			if((fp = fopen(*g, "r")) != NULL)
 				break;
-	if(fp == NULL)
-	{
-		error_set_code(1, "%s", "Could not load MIME globs");
-		object_delete(mime);
-		return NULL;
-	}
 	mime->types = NULL;
 	mime->types_cnt = 0;
 	_new_config(mime);
+	if(fp == NULL)
+		/* XXX no globs could be loaded */
+		return mime;
 	while(fgets(buf, sizeof(buf), fp) != NULL)
 	{
 		errno = EINVAL;
