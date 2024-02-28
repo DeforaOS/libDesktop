@@ -140,8 +140,10 @@ int desktop_message_register(GtkWidget * window, char const * destination,
 	gdk_add_client_message_filter(atom, _desktop_message_on_callback, mc);
 # endif
 #else
+	GdkDisplay * display;
 	struct sockaddr_un addr;
 
+	display = gdk_display_get_default();
 	if((p = realloc(_callbacks, sizeof(*p) * (_callbacks_cnt + 1))) == NULL)
 		return -error_set_code(1, "%s", strerror(errno));
 	_callbacks = p;
@@ -153,7 +155,8 @@ int desktop_message_register(GtkWidget * window, char const * destination,
 	memset(&addr, 0, sizeof(addr));
 	addr.sun_family = AF_UNIX;
 	snprintf(addr.sun_path, sizeof(addr.sun_path), "%s/%s-%s",
-			g_get_tmp_dir(), gdk_get_display(), destination);
+			g_get_tmp_dir(), gdk_display_get_name(display),
+			destination);
 	addr.sun_len = sizeof(addr) - sizeof(addr.sun_path)
 		+ strlen(addr.sun_path) + 1;
 	if((mc->socket = socket(addr.sun_family, SOCK_STREAM, 0)) < 0)
@@ -235,14 +238,17 @@ int desktop_message_send(char const * destination, uint32_t value1,
 	return 0;
 # endif
 #else
+	GdkDisplay * display;
 	int fd;
 	struct sockaddr_un addr;
 	char buf[33];
 
+	display = gdk_display_get_default();
 	memset(&addr, 0, sizeof(addr));
 	addr.sun_family = AF_UNIX;
 	snprintf(addr.sun_path, sizeof(addr.sun_path), "%s/%s-%s",
-			g_get_tmp_dir(), gdk_get_display(), destination);
+			g_get_tmp_dir(), gdk_display_get_name(display),
+			destination);
 	addr.sun_len = sizeof(addr) - sizeof(addr.sun_path)
 		+ strlen(addr.sun_path) + 1;
 	if((fd = socket(addr.sun_family, SOCK_STREAM, 0)) < 0)
