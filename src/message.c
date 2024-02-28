@@ -191,10 +191,6 @@ int desktop_message_register(GtkWidget * window, char const * destination,
 int desktop_message_send(char const * destination, uint32_t value1,
 		uint32_t value2, uint32_t value3)
 {
-#ifdef DEBUG
-	fprintf(stderr, "DEBUG: %s(%s, 0x%x, 0x%x, 0x%x)\n", __func__,
-			destination, value1, value2, value3);
-#endif
 #if defined(GDK_WINDOWING_X11)
 # if GTK_CHECK_VERSION(3, 0, 0)
 	GdkDisplay * display;
@@ -202,6 +198,10 @@ int desktop_message_send(char const * destination, uint32_t value1,
 	XEvent xev;
 	XClientMessageEvent * xcme = &xev.xclient;
 
+#  ifdef DEBUG
+	fprintf(stderr, "DEBUG: %s(%s, 0x%x, 0x%x, 0x%x)\n", __func__,
+			destination, value1, value2, value3);
+#  endif
 	display = gdk_display_get_default();
 	xdisplay = gdk_x11_display_get_xdisplay(display);
 	memset(&xev, 0, sizeof(xev));
@@ -224,6 +224,10 @@ int desktop_message_send(char const * destination, uint32_t value1,
 	GdkEvent event;
 	GdkEventClient * client = &event.client;
 
+#  ifdef DEBUG
+	fprintf(stderr, "DEBUG: %s(%s, 0x%x, 0x%x, 0x%x)\n", __func__,
+			destination, value1, value2, value3);
+#  endif
 	atom = gdk_atom_intern(destination, FALSE);
 	memset(&event, 0, sizeof(event));
 	client->type = GDK_CLIENT_EVENT;
@@ -243,6 +247,10 @@ int desktop_message_send(char const * destination, uint32_t value1,
 	struct sockaddr_un addr;
 	char buf[33];
 
+# ifdef DEBUG
+	fprintf(stderr, "DEBUG: %s(%s, 0x%x, 0x%x, 0x%x)\n", __func__,
+			destination, value1, value2, value3);
+# endif
 	display = gdk_display_get_default();
 	memset(&addr, 0, sizeof(addr));
 	addr.sun_family = AF_UNIX;
