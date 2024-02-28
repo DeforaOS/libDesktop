@@ -43,6 +43,10 @@
 # else
 #  include <gdk/gdkx.h>
 # endif
+#else
+# include <sys/socket.h>
+# include <sys/un.h>
+# include <unistd.h>
 #endif
 #include <System.h>
 #include "Desktop.h"
@@ -61,6 +65,10 @@ typedef struct _MessageCallback
 	GtkWidget * widget;
 	Window xwindow;
 # endif
+#else
+	int socket;
+	GIOChannel * channel;
+	guint id;
 #endif
 	DesktopMessageCallback callback;
 	void * data;
@@ -77,6 +85,9 @@ static size_t _callbacks_cnt = 0;
 #if defined(GDK_WINDOWING_X11)
 static GdkFilterReturn _desktop_message_on_callback(GdkXEvent * xevent,
 		GdkEvent * event, gpointer data);
+#else
+static gboolean _desktop_message_on_connect(GIOChannel * channel,
+		GIOCondition condition, gpointer data);
 #endif
 
 
@@ -88,11 +99,13 @@ int desktop_message_register(GtkWidget * window, char const * destination,
 {
 	MessageCallback ** p;
 	MessageCallback * mc;
-	GdkWindow * gwindow;
 #if defined(GDK_WINDOWING_X11)
+	GdkWindow * gwindow;
 # if !GTK_CHECK_VERSION(3, 0, 0)
 	GdkAtom atom;
 # endif
+#else
+	(void) window;
 #endif
 
 #ifdef DEBUG
@@ -126,6 +139,47 @@ int desktop_message_register(GtkWidget * window, char const * destination,
 	atom = gdk_atom_intern(destination, FALSE);
 	gdk_add_client_message_filter(atom, _desktop_message_on_callback, mc);
 # endif
+#else
+	struct sockaddr_un addr;
+
+	if((p = realloc(_callbacks, sizeof(*p) * (_callbacks_cnt + 1))) == NULL)
+		return -error_set_code(1, "%s", strerror(errno));
+	_callbacks = p;
+	if((mc = object_new(sizeof(*mc))) == NULL)
+		return -1;
+	_callbacks[_callbacks_cnt] = mc;
+	mc->callback = callback;
+	mc->data = data;
+	memset(&addr, 0, sizeof(addr));
+	addr.sun_family = AF_UNIX;
+	snprintf(addr.sun_path, sizeof(addr.sun_path), "%s/%s-%s",
+			g_get_tmp_dir(), gdk_get_display(), destination);
+	addr.sun_len = sizeof(addr) - sizeof(addr.sun_path)
+		+ strlen(addr.sun_path) + 1;
+	if((mc->socket = socket(addr.sun_family, SOCK_STREAM, 0)) < 0)
+		return -error_set_code(1, "%s: %s: %s", "socket",
+				addr.sun_path);
+	if(bind(mc->socket, (struct sockaddr *)&addr, sizeof(addr)) != 0)
+	{
+		error_set_code(1, "%s: %s: %s", "bind", addr.sun_path,
+				strerror(errno));
+		close(mc->socket);
+		unlink(addr.sun_path);
+		return -1;
+	}
+	if(listen(mc->socket, 5) != 0)
+	{
+		error_set_code(1, "%s: %s: %s", "listen", addr.sun_path,
+				strerror(errno));
+		close(mc->socket);
+		unlink(addr.sun_path);
+		return -1;
+	}
+	mc->channel = g_io_channel_unix_new(mc->socket);
+	g_io_channel_set_encoding(mc->channel, NULL, NULL);
+	mc->id = g_io_add_watch(mc->channel, G_IO_IN,
+			_desktop_message_on_connect, NULL);
+	_callbacks_cnt++;
 #endif
 	return 0;
 }
@@ -135,6 +189,10 @@ int desktop_message_register(GtkWidget * window, char const * destination,
 int desktop_message_send(char const * destination, uint32_t value1,
 		uint32_t value2, uint32_t value3)
 {
+#ifdef DEBUG
+	fprintf(stderr, "DEBUG: %s(%s, 0x%x, 0x%x, 0x%x)\n", __func__,
+			destination, value1, value2, value3);
+#endif
 #if defined(GDK_WINDOWING_X11)
 # if GTK_CHECK_VERSION(3, 0, 0)
 	GdkDisplay * display;
@@ -178,8 +236,37 @@ int desktop_message_send(char const * destination, uint32_t value1,
 	return 0;
 # endif
 #else
-	/* FIXME not implemented */
-	return -1;
+	int fd;
+	struct sockaddr_un addr;
+	char buf[33];
+
+	memset(&addr, 0, sizeof(addr));
+	addr.sun_family = AF_UNIX;
+	snprintf(addr.sun_path, sizeof(addr.sun_path), "%s/%s-%s",
+			g_get_tmp_dir(), gdk_get_display(), destination);
+	addr.sun_len = sizeof(addr) - sizeof(addr.sun_path)
+		+ strlen(addr.sun_path) + 1;
+	if(access(addr.sun_path, W_OK) == 0)
+		return -error_set_code(1, "%s: %s", addr.sun_path,
+				strerror(errno));
+	if((fd = socket(addr.sun_family, SOCK_STREAM, 0)) < 0)
+		return -error_set_code(1, "%s: %s: %s", "socket", addr.sun_path,
+				strerror(errno));
+	if(connect(fd, (struct sockaddr *)&addr, sizeof(addr)) != 0)
+	{
+		close(fd);
+		return -error_set_code(1, "%s: %s: %s", "connect",
+				addr.sun_path, strerror(errno));
+	}
+	snprintf(buf, sizeof(buf), "0x%x:0x%x:0x%x", value1, value2, value3);
+	if(send(fd, buf, strlen(buf), 0) != (ssize_t)strlen(buf))
+	{
+		close(fd);
+		return -error_set_code(1, "%s: %s: %s", "send", addr.sun_path,
+				strerror(errno));
+	}
+	close(fd);
+	return 0;
 #endif
 }
 
@@ -191,11 +278,13 @@ void desktop_message_unregister(GtkWidget * window,
 	size_t i;
 	MessageCallback ** p;
 	MessageCallback * mc;
+#if defined(GDK_WINDOWING_X11)
 	GdkWindow * w;
+#endif
 
-# ifdef DEBUG
+#ifdef DEBUG
 	fprintf(stderr, "DEBUG: %s(%p, %p)\n", __func__, callback, data);
-# endif
+#endif
 	for(i = 0; i < _callbacks_cnt; i++)
 	{
 		mc = _callbacks[i];
@@ -206,24 +295,31 @@ void desktop_message_unregister(GtkWidget * window,
 	}
 	if(i == _callbacks_cnt)
 		return;
-#if GTK_CHECK_VERSION(3, 0, 0)
-	w = (window != NULL) ? gtk_widget_get_window(window) : NULL;
-#else
-	w = gtk_widget_get_window(mc->widget);
-#endif
 #if defined(GDK_WINDOWING_X11)
+# if GTK_CHECK_VERSION(3, 0, 0)
+	w = (window != NULL) ? gtk_widget_get_window(window) : NULL;
+# else
+	w = gtk_widget_get_window(mc->widget);
+# endif
 	gdk_window_remove_filter(w, _desktop_message_on_callback, mc);
 # if !GTK_CHECK_VERSION(3, 0, 0)
 	if(mc->window == NULL)
 		gtk_widget_destroy(mc->widget);
 # endif
+#else
+	if(mc->id > 0)
+		g_source_remove(mc->id);
+	if(mc->channel != NULL)
+		g_io_channel_unref(mc->channel);
+	if(mc->socket >= 0)
+		close(mc->socket);
+#endif
 	object_delete(mc);
 	p = &_callbacks[i];
 	memmove(p, p + 1, sizeof(*p) * (_callbacks_cnt - i - 1));
 	if((p = realloc(_callbacks, sizeof(*p) * (--_callbacks_cnt))) != NULL
 			|| _callbacks_cnt == 0)
 		_callbacks = p;
-#endif
 }
 
 
@@ -245,25 +341,25 @@ static GdkFilterReturn _desktop_message_on_callback(GdkXEvent * xevent,
 	if(xev->type != ClientMessage)
 		return GDK_FILTER_CONTINUE;
 	xcme = &xev->xclient;
-#if GTK_CHECK_VERSION(3, 0, 0)
-# ifdef DEBUG
+# if GTK_CHECK_VERSION(3, 0, 0)
+#  ifdef DEBUG
 	fprintf(stderr, "DEBUG: %s(%lu %lu %p)\n", __func__, xcme->serial,
 			xcme->window, (void *)mc);
-# endif
+#  endif
 	if(mc->atom != xcme->message_type)
 		return GDK_FILTER_CONTINUE;
-#else
-# ifdef DEBUG
+# else
+#  ifdef DEBUG
 	fprintf(stderr, "DEBUG: %s(%lu %lu %p) %lu\n", __func__, xcme->serial,
 			xcme->window, mc, (void *)mc->xwindow);
-# endif
+#  endif
 	if(mc->xwindow != xcme->window)
 		return GDK_FILTER_CONTINUE;
-#endif
-#ifdef DEBUG
+# endif
+# ifdef DEBUG
 	fprintf(stderr, "DEBUG: %s() %p(%p)\n", __func__, (void *)mc->callback,
 			(void *)mc->data);
-#endif
+# endif
 	value1 = xcme->data.l[0];
 	value2 = xcme->data.l[1];
 	value3 = xcme->data.l[2];
@@ -271,5 +367,44 @@ static GdkFilterReturn _desktop_message_on_callback(GdkXEvent * xevent,
 		return GDK_FILTER_CONTINUE;
 	desktop_message_unregister(mc->window, mc->callback, mc->data);
 	return GDK_FILTER_REMOVE;
+}
+#else
+static gboolean _desktop_message_on_connect(GIOChannel * channel,
+		GIOCondition condition, gpointer data)
+{
+	size_t i;
+	MessageCallback * mc;
+	int fd;
+	char buf[33];
+	ssize_t len;
+	uint32_t value1;
+	uint32_t value2;
+	uint32_t value3;
+	(void) data;
+
+# ifdef DEBUG
+	fprintf(stderr, "DEBUG: %s()\n", __func__);
+# endif
+	if(condition != G_IO_IN)
+		return FALSE;
+	for(i = 0; i < _callbacks_cnt; i++)
+		if(_callbacks[i]->channel == channel)
+			break;
+	if(i == _callbacks_cnt)
+		return FALSE;
+	mc = _callbacks[i];
+	fd = accept(mc->socket, NULL, NULL);
+	len = recv(fd, buf, sizeof(buf) - 1, 0);
+	close(fd);
+	if(len > 0 && (size_t)len < sizeof(buf))
+	{
+		buf[len] = '\0';
+		if(sscanf(buf, "0x%x:0x%x:0x%x", &value1, &value2, &value3) == 3
+				&& mc->callback(mc->data, value1, value2,
+					value3) != 0)
+			desktop_message_unregister(mc->window, mc->callback,
+					mc->data);
+	}
+	return TRUE;
 }
 #endif
