@@ -246,9 +246,6 @@ int desktop_message_send(char const * destination, uint32_t value1,
 			g_get_tmp_dir(), gdk_get_display(), destination);
 	addr.sun_len = sizeof(addr) - sizeof(addr.sun_path)
 		+ strlen(addr.sun_path) + 1;
-	if(access(addr.sun_path, W_OK) == 0)
-		return -error_set_code(1, "%s: %s", addr.sun_path,
-				strerror(errno));
 	if((fd = socket(addr.sun_family, SOCK_STREAM, 0)) < 0)
 		return -error_set_code(1, "%s: %s: %s", "socket", addr.sun_path,
 				strerror(errno));
