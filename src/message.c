@@ -390,7 +390,9 @@ static gboolean _desktop_message_on_connect(GIOChannel * channel,
 	if(i == _callbacks_cnt)
 		return FALSE;
 	mc = _callbacks[i];
-	fd = accept(mc->socket, NULL, NULL);
+	if((fd = accept(mc->socket, NULL, NULL)) < 0)
+		/* XXX ignore these errors */
+		return TRUE;
 	len = recv(fd, buf, sizeof(buf) - 1, 0);
 	close(fd);
 	if(len > 0 && (size_t)len < sizeof(buf))
