@@ -1,5 +1,5 @@
 /* $Id$ */
-/* Copyright (c) 2011-2022 Pierre Pronchery <khorben@defora.org> */
+/* Copyright (c) 2011-2024 Pierre Pronchery <khorben@defora.org> */
 /* This file is part of DeforaOS libDesktop */
 /* All rights reserved.
  *
