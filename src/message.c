@@ -157,8 +157,7 @@ int desktop_message_register(GtkWidget * window, char const * destination,
 	addr.sun_len = sizeof(addr) - sizeof(addr.sun_path)
 		+ strlen(addr.sun_path) + 1;
 	if((mc->socket = socket(addr.sun_family, SOCK_STREAM, 0)) < 0)
-		return -error_set_code(1, "%s: %s: %s", "socket",
-				addr.sun_path);
+		return -error_set_code(1, "%s: %s", "socket", strerror(errno));
 	if(bind(mc->socket, (struct sockaddr *)&addr, sizeof(addr)) != 0)
 	{
 		error_set_code(1, "%s: %s: %s", "bind", addr.sun_path,
@@ -247,8 +246,7 @@ int desktop_message_send(char const * destination, uint32_t value1,
 	addr.sun_len = sizeof(addr) - sizeof(addr.sun_path)
 		+ strlen(addr.sun_path) + 1;
 	if((fd = socket(addr.sun_family, SOCK_STREAM, 0)) < 0)
-		return -error_set_code(1, "%s: %s: %s", "socket", addr.sun_path,
-				strerror(errno));
+		return -error_set_code(1, "%s: %s", "socket", strerror(errno));
 	if(connect(fd, (struct sockaddr *)&addr, sizeof(addr)) != 0)
 	{
 		close(fd);
