@@ -27,8 +27,11 @@
 #variables
 [ -n "$OBJDIR" ] || OBJDIR="./"
 PROGNAME="tests.sh"
+SYSTEM="$(uname -s)"
 #executables
 DATE="date"
+ECHO="echo"
+[ "$SYSTEM" = "Darwin" ] && ECHO="/bin/echo"
 
 
 #functions
@@ -47,7 +50,7 @@ _run()
 	[ $# -eq 1 ] || sep=" "
 
 	shift
-	echo -n "$test:" 1>&2
+	$ECHO -n "$test:" 1>&2
 	(echo
 	echo "Testing: $test" "$@"
 	testexe="./$test"
