@@ -82,7 +82,7 @@ _test()
 #usage
 _usage()
 {
-	echo "Usage: $PROGNAME [-c][-P prefix]" 1>&2
+	echo "Usage: $PROGNAME [-c][-P prefix] target" 1>&2
 	return 1
 }
 
@@ -95,7 +95,7 @@ while getopts "cP:" name; do
 			clean=1
 			;;
 		P)
-			#XXX ignored
+			#XXX ignored for compatibility
 			;;
 		?)
 			_usage
@@ -110,7 +110,7 @@ if [ $# -ne 1 ]; then
 fi
 target="$1"
 
-[ "$clean" -ne 0 ]			&& exit 0
+[ $clean -ne 0 ] && exit 0
 
 tests="mime mimehandler pkgconfig.sh"
 failures=
